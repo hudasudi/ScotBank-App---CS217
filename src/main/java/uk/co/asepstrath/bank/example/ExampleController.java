@@ -116,12 +116,14 @@ public class ExampleController {
     }
 
     @GET("/data")
-    public Account data(@QueryParam String name){
+    public String data(){
         Account[] array = App.getList();
+        StringBuilder out = new StringBuilder();
         for(Account a: array){
-            if(a.getName().equals(name)) return a;
+            out.append(a.toString() + "\n\n");
         }
-        return null;
+
+        return out.toString();
     }
 
     /*
