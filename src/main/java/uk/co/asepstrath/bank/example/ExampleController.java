@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.App;
+
 /*
     Example Controller is a Controller from the MVC paradigm.
     The @Path Annotation will tell Jooby what /path this Controller can respond to,
@@ -110,6 +113,17 @@ public class ExampleController {
 
         return new ModelAndView("dice.hbs", model);
 
+    }
+
+    @GET("/data")
+    public String data(){
+        Account[] array = App.getList();
+        StringBuilder out = new StringBuilder();
+        for(Account a: array){
+            out.append(a.toString() + "\n\n");
+        }
+
+        return out.toString();
     }
 
     /*
