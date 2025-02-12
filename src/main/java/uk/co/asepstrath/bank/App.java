@@ -10,11 +10,14 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.example.ExampleController_;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class App extends Jooby {
+
+    private static Account[] list;
 
     {
         /*
@@ -38,7 +41,7 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        mvc(new ExampleController_(ds,log));
+        mvc(new ExampleController_(ds, log));
 
         /*
         Finally we register our application lifecycle methods
@@ -70,13 +73,27 @@ public class App extends Jooby {
         } catch (SQLException e) {
             log.error("Database Creation Error",e);
         }
+
+        this.list = new Account[]{
+                new Account("Rachel", BigDecimal.valueOf(50)),
+                new Account("Monica", BigDecimal.valueOf(100)),
+                new Account("Phoebe", BigDecimal.valueOf(76)),
+                new Account("Joey", BigDecimal.valueOf(23.90)),
+                new Account("Chandler", BigDecimal.valueOf(3)),
+                new Account("Ross", BigDecimal.valueOf(54.32)),
+        };
     }
+
 
     /*
     This function will be called when the application shuts down
      */
     public void onStop() {
         System.out.println("Shutting Down...");
+    }
+
+    public static Account[] getList(){
+        return list;
     }
 
 }
