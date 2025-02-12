@@ -13,7 +13,7 @@ public class AccountTests {
 
     @BeforeEach
     void setUp(){
-        a = new Account("Test",BigDecimal.ZERO);
+        a = new Account("ID","NAME",BigDecimal.ZERO,true);
     }
     @Test
     public void createAccount(){
@@ -65,10 +65,6 @@ public class AccountTests {
         assertEquals(a.getBalance(),BigDecimal.valueOf(23.01).setScale(2, RoundingMode.HALF_UP));
     }
 
-    @Test
-    public void output(){
-        a = new Account("Damian", 50);
-        assertEquals("Name: Damian \nBalance: 50.00", a.toString());
-    }
+
 
 }

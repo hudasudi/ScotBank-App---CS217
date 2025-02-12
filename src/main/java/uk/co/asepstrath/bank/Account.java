@@ -7,19 +7,19 @@ public class Account {
 
     private BigDecimal balance;
     private final String name;
+    private final String id;
+    private boolean roundUpEnabled;
 
 
-    public Account(String name, BigDecimal startValue){
-        balance = startValue;
+
+    public Account(String id, String name, BigDecimal startingBalance, Boolean roundUpEnabled){
+        balance = startingBalance;
         this.name = name;
-        balance = balance.setScale(2, RoundingMode.HALF_UP);
+        this.id = id;
+        if(roundUpEnabled){balance = balance.setScale(2, RoundingMode.HALF_UP);}
+        else{balance = balance.setScale(2, RoundingMode.HALF_DOWN);}
     }
 
-    public Account(String name, double startValue){
-        balance = BigDecimal.valueOf(startValue);
-        this.name = name;
-        balance = balance.setScale(2, RoundingMode.HALF_UP);
-    }
 
     public void deposit(BigDecimal amount) {
         balance = balance.add(amount);
