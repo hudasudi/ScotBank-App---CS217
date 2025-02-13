@@ -54,6 +54,13 @@ public class AccountsAPIParser {
         return element_list.getAsJsonArray();
     }
 
+    /**
+     * Take the respones from the API, parse the JSON inside of it, create a new Account from each
+     * element in the Json Array and return an ArrayList of created Accounts
+     * @return ArrayList<Account> of all accounts created from each Json element
+     * @throws IOException if an I/O error occurs when sending or receiving, or the client has shut down
+     * @throws InterruptedException if the operation is interrupted
+     */
     public ArrayList<Account> jsonToAccounts() throws IOException, InterruptedException {
         JsonArray elements = this.parseJSONResponse();
         ArrayList<Account> outList = new ArrayList<>();
