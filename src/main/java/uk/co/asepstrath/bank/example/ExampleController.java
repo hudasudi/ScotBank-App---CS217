@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank.example;
 
-import com.google.gson.*;
 import io.jooby.ModelAndView;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
@@ -10,15 +9,10 @@ import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -124,27 +118,9 @@ public class ExampleController {
 
    @GET("/accounts")
     public String getAccounts() throws IOException, InterruptedException {
+        AccountsAPIParser parser = new AccountsAPIParser("https://api.asep-strath.co.uk/api/accounts");
 
-        // https://medium.com/@felvid/java-http-client-guide-a9b18920d2a2
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.asep-strath.co.uk/api/accounts"))
-                .build();
-        HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        String out = "STATUS => " + resp.statusCode();
-
-        String responseJson = resp.body();
-
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(responseJson);
-        JsonArray arr = element.getAsJsonArray();
-
-
-        return arr.get(0).toString();
-
-
+        return parser.prettifyJSONOutput();
     }
 
     @GET("/data")
