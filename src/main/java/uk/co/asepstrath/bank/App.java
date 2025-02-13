@@ -53,7 +53,7 @@ public class App extends Jooby {
     /*
     This function will be called when the application starts up,
     it should be used to ensure that the DB is properly setup
-     */
+    */
     public void onStart() {
         Logger log = getLog();
         log.info("Starting Up...");
@@ -67,10 +67,9 @@ public class App extends Jooby {
             stmt.executeUpdate("CREATE TABLE `Example` (`Key` varchar(255),`Value` varchar(255))");
             stmt.executeUpdate("INSERT INTO Example " + "VALUES ('WelcomeMessage', 'Welcome to A Bank')");
         } catch (SQLException e) {
-            log.error("Database Creation Error",e);
+            log.error("Database Creation Error", e);
         }
     }
-
 
     /*
     This function will be called when the application shuts down

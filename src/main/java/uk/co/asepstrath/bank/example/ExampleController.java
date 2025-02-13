@@ -7,6 +7,7 @@ import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Account;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -112,8 +113,7 @@ public class ExampleController {
 
     }
 
-    /**
-     * Takes a list of all accounts, chunks them into sections of chunk_size then returns a new list in chunks of chunk_size
+    /** Takes a list of all accounts, chunks them into sections of chunk_size then returns a new list in chunks of chunk_size
      * @param list_to_chunk The list to chunk into sections
      * @param chunk_size The number of elements per chunk in the list
      * @return The newly chunked list
@@ -171,6 +171,28 @@ public class ExampleController {
 
         // Pass off our chunked list to handlebars for processing
         return new ModelAndView("accounts.hbs", model);
+    }
+
+    @GET("/accountsObjects")
+    public String accountsObjects() throws IOException, InterruptedException {
+        AccountsAPIParser parser = new AccountsAPIParser("https://api.asep-strath.co.uk/api/accounts");
+        ArrayList<Account> array = parser.jsonToAccounts();
+
+        StringBuilder out = new StringBuilder();
+
+        for(Account a : array) {
+            out.append(a.toString()).append("\n\n");
+        }
+
+        return out.toString();
+    }
+
+    @GET("/accountsObject")
+    public String accountsObject(@QueryParam int pos) throws IOException, InterruptedException {
+        AccountsAPIParser parser = new AccountsAPIParser("https://api.asep-strath.co.uk/api/accounts");
+        ArrayList<Account> array = parser.jsonToAccounts();
+
+        return array.get(pos).toString();
     }
 
     /*
