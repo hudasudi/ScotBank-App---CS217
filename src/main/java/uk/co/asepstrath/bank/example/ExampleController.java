@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -121,6 +122,25 @@ public class ExampleController {
         AccountsAPIParser parser = new AccountsAPIParser("https://api.asep-strath.co.uk/api/accounts");
 
         return parser.prettifyJSONOutput();
+    }
+
+    @GET("/accountsObjects")
+    public String accountsObjects() throws IOException, InterruptedException {
+        AccountsAPIParser parser = new AccountsAPIParser("https://api.asep-strath.co.uk/api/accounts");
+        ArrayList<Account> array = parser.jsonToAccounts();
+        StringBuilder out = new StringBuilder();
+        for(Account a: array){
+            out.append(a.toString() + "\n\n");
+        }
+        return out.toString();
+    }
+
+    @GET("/accountsObject")
+    public String accountsObject(@QueryParam int pos) throws IOException, InterruptedException {
+        AccountsAPIParser parser = new AccountsAPIParser("https://api.asep-strath.co.uk/api/accounts");
+        ArrayList<Account> array = parser.jsonToAccounts();
+
+        return array.get(pos).toString();
     }
 
     @GET("/data")
