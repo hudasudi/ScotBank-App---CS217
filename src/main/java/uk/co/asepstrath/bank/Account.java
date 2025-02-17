@@ -10,37 +10,61 @@ public class Account {
     private BigDecimal balance;
     private boolean roundUpEnabled;
 
-    public Account(String id, String name, BigDecimal startingBalance, Boolean roundUpEnabled){
+    /** A basic class for Account information
+     * @param id The Account UUID
+     * @param name The Account holders name
+     * @param startingBalance The Account's starting balance
+     * @param roundUpEnabled Whether we round an Account's balance up
+    */
+    public Account(String id, String name, BigDecimal startingBalance, Boolean roundUpEnabled) {
         this.id = id;
         this.name = name;
         this.balance = startingBalance;
+        this.roundUpEnabled = roundUpEnabled;
 
-        if(roundUpEnabled) { balance = balance.setScale(2, RoundingMode.HALF_UP); }
-        else{ balance = balance.setScale(2, RoundingMode.HALF_DOWN); }
+        this.balance = (this.roundUpEnabled)
+                ? this.balance.setScale(2, RoundingMode.HALF_UP)
+                : this.balance.setScale(2, RoundingMode.HALF_DOWN);
     }
 
+    /** Deposit money into an Account
+     * @param amount The amount to deposit
+    */
     public void deposit(BigDecimal amount) {
         this.balance = this.balance.add(amount);
         this.balance = this.balance.setScale(2, RoundingMode.HALF_UP);
     }
 
+    /** Withdraw an amount from the Account
+     * @param amount The amount to withdraw
+     * @throws ArithmeticException Thrown during exceptional arithmetic conditions
+     */
     public void withdraw(BigDecimal amount) throws ArithmeticException {
         if(this.balance.subtract(amount).compareTo(BigDecimal.valueOf(0)) >= 0) {
             this.balance = this.balance.subtract(amount);
-        } else {
+        }
+
+        else {
             throw new ArithmeticException();
         }
     }
 
+    /** Get an accounts balance
+     * @return The accounts balance
+    */
     public BigDecimal getBalance() {
-        System.out.println(balance);
-
-        return balance;
+        return this.balance;
     }
 
-    public String getName() { return name; }
+    /** Get an Account holder's name
+     * @return The Account holder's name
+    */
+    public String getName() { return this.name; }
 
+    /** Stringify an Account's information
+     * @return A String holding Account information
+    */
     public String toString() {
-        return "Name: " + name + " \nBalance: " + balance;
+        return "Name: " + this.name + " \nBalance: " + this.balance;
     }
 }

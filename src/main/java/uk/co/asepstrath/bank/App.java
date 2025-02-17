@@ -61,22 +61,12 @@ public class App extends Jooby {
         Logger log = getLog();
         log.info("Starting Up...");
 
-        try {
-            log.info("Attempting to retrieve API information");
+        log.info("Attempting to retrieve API information");
 
-            parser = new AccountAPIParser("https://api.asep-strath.co.uk/api/accounts", "src/main/resources/api/api.json");
-            parser.writeAPIInformation();
+        parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", "src/main/resources/api/api.json");
+        parser.writeAPIInformation();
 
-            log.info("Successfully retrieved & stored API information");
-        }
-
-        catch(IOException e) {
-            log.error("Error: IOException whilst trying to retrieve & write API information to file", e);
-        }
-
-        catch(InterruptedException e) {
-            log.error("Error: Interrupted whilst trying to retrieve & write API information to file", e);
-        }
+        log.info("Successfully retrieved & stored API information");
 
         // Fetch DB Source
         DataSource ds = require(DataSource.class);
@@ -101,12 +91,6 @@ public class App extends Jooby {
 
         log.info("Shutting Down...");
 
-        try {
-            parser.removeAPIInformation();
-        }
-
-        catch(IOException e) {
-            log.error("Error whilst trying to delete API infromation", e);
-        }
+        parser.removeAPIInformation();
     }
 }

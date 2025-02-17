@@ -107,34 +107,6 @@ public class ExampleController {
 
     }
 
-//    @GET("/account-view")
-//    public ModelAndView getAccounts() throws IOException, InterruptedException {
-//        Map<String, Object> model = manip.manip_ls();
-//
-//        // Pass off our chunked list to handlebars for processing
-//        return new ModelAndView("accounts.hbs", model);
-//    }
-
-//    @GET("/accountsObjects")
-//    public String accountsObjects() throws IOException, InterruptedException {
-//        ArrayList<Account> array = manip.jsonToAccounts();
-//
-//        StringBuilder out = new StringBuilder();
-//
-//        for(Account a : array) {
-//            out.append(a.toString()).append("\n\n");
-//        }
-//
-//        return out.toString();
-//    }
-
-//    @GET("/accountsObject")
-//    public String accountsObject(@QueryParam int pos) throws IOException, InterruptedException {
-//        ArrayList<Account> array = manip.jsonToAccounts();
-//
-//        return array.get(pos).toString();
-//    }
-
     /*
     The @POST annotation registers this function as a HTTP POST handler.
     It will look at the body of the POST request and try to deserialise into a MyMessage object

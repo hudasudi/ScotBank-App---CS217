@@ -3,6 +3,7 @@ package uk.co.asepstrath.bank.api;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
 import java.io.FileReader;
@@ -14,8 +15,14 @@ import java.util.Map;
 
 public class AccountAPIManipulator {
 	private final String API_FILE;
+	private final Logger log;
 
-	public AccountAPIManipulator(String api_file) {
+	/** This class manipulates API information to format it into varied forms
+	 * @param log The program log
+	 * @param api_file The PATH location for the API file during runtime
+	*/
+	public AccountAPIManipulator(Logger log, String api_file) {
+		this.log = log;
 		this.API_FILE = api_file;
 	}
 
@@ -29,9 +36,7 @@ public class AccountAPIManipulator {
 			return gson.fromJson(new FileReader(API_FILE), JsonArray.class);
 
 		} catch(IOException e) {
-			System.out.println("Error whilst getting api information");
-			e.printStackTrace();
-
+			log.error("Error whilst getting API information", e);
 			return null;
 		}
 	}
@@ -58,7 +63,10 @@ public class AccountAPIManipulator {
 		return accounts_list;
 	}
 
-	public Map<String, Object> manip_ls() {
+	/** Take the response JSON from the API & format it so that Handlebars can utilise the information
+	 * @return Formatted (Handlebars compliant) map for the HTML template
+	*/
+	public Map<String, Object> createHandleBarsJSONMap() {
 		// Get API information from file
 		JsonArray json = this.getApiInformation();
 
@@ -84,6 +92,10 @@ public class AccountAPIManipulator {
 		return model;
 	}
 
+	/** Take a JsonObject & Convert it into a Map of Key-Value Pairs
+	 * @param object The JsonObject to convert
+	 * @return A map of all the JsonObject's Key-Value Pairs
+	*/
 	private Map<String, String> createJsonMap(JsonObject object) {
 		// The account map for the JsonObject
 		Map<String, String> map = new HashMap<>();
