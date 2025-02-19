@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank;
 
 import io.jooby.netty.NettyServer;
-import uk.co.asepstrath.bank.example.ExampleController;
 import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
@@ -10,14 +9,11 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.example.ExampleController_;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class App extends Jooby {
-
-    private static Account[] list;
 
     {
         /*
@@ -73,15 +69,6 @@ public class App extends Jooby {
         } catch (SQLException e) {
             log.error("Database Creation Error",e);
         }
-
-        this.list = new Account[]{
-                new Account("3280489038","Rachel", BigDecimal.valueOf(50),true),
-                new Account("1882587483","Monica", BigDecimal.valueOf(100),true),
-                new Account("8784973589","Phoebe", BigDecimal.valueOf(76),true),
-                new Account("3829758782","Joey", BigDecimal.valueOf(23.90),true),
-                new Account("3897584378","Chandler", BigDecimal.valueOf(3),true),
-                new Account("8297589748","Ross", BigDecimal.valueOf(54.32),true),
-        };
     }
 
 
@@ -91,9 +78,4 @@ public class App extends Jooby {
     public void onStop() {
         System.out.println("Shutting Down...");
     }
-
-    public static Account[] getList(){
-        return list;
-    }
-
 }

@@ -5,12 +5,10 @@ import java.math.RoundingMode;
 
 public class Account {
 
-    private BigDecimal balance;
-    private final String name;
     private final String id;
+    private final String name;
+    private BigDecimal balance;
     private boolean roundUpEnabled;
-
-
 
     public Account(String id, String name, BigDecimal startingBalance, Boolean roundUpEnabled){
         balance = startingBalance;

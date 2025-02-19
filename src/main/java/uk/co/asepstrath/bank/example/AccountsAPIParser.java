@@ -4,14 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import uk.co.asepstrath.bank.Account;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 
 public class AccountsAPIParser {
     private final String API_URL;
@@ -55,26 +53,7 @@ public class AccountsAPIParser {
     }
 
     /**
-     * Take the respones from the API, parse the JSON inside of it, create a new Account from each
-     * element in the Json Array and return an ArrayList of created Accounts
-     * @return ArrayList<Account> of all accounts created from each Json element
-     * @throws IOException if an I/O error occurs when sending or receiving, or the client has shut down
-     * @throws InterruptedException if the operation is interrupted
-     */
-    public ArrayList<Account> jsonToAccounts() throws IOException, InterruptedException {
-        JsonArray elements = this.parseJSONResponse();
-        ArrayList<Account> outList = new ArrayList<>();
-        for(int i = 0; i < elements.size(); i++){
-            JsonObject element = elements.get(i).getAsJsonObject();
-            outList.add(new Account(element.get("id").toString(), element.get("name").toString(),
-                    element.get("startingBalance").getAsBigDecimal(),
-                    element.get("roundUpEnabled").getAsBoolean()));
-        }
-        return outList;
-    }
-
-    /**
-     * Take the parse JSOn from the API response & prettify it, making it easier to read
+     * Take the parse JSON from the API response & prettify it, making it easier to read
      * @return Prettified JSON output as a string
      * @throws IOException if an I/O error occurs when sending or receiving, or the client has shut down
      * @throws InterruptedException if the operation is interrupted
