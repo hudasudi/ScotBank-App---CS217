@@ -65,6 +65,28 @@ public class AccountTests {
         assertEquals(a.getBalance(),BigDecimal.valueOf(23.01).setScale(2, RoundingMode.HALF_UP));
     }
 
+    @Test
+    public void roundUpFalse(){
+        a = new Account("ID","NAME",BigDecimal.ZERO,false);
+        a.deposit(BigDecimal.valueOf(2.55555));
+        assertEquals(BigDecimal.valueOf(2.55555),a.getBalance());
+    }
 
+    @Test
+    public void roundUpTrue(){
+        a = new Account("ID","NAME",BigDecimal.ZERO,true);
+        a.deposit(BigDecimal.valueOf(2.55555));
+        assertEquals(BigDecimal.valueOf(2.56),a.getBalance());
+    }
+
+    @Test
+    public void nameTest(){
+        assertEquals("NAME", a.getName());
+    }
+
+    @Test
+    public void toStringTest(){
+        assertEquals("Name: NAME \nBalance: 0",a.toString());
+    }
 
 }
