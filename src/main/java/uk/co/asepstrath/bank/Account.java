@@ -5,45 +5,66 @@ import java.math.RoundingMode;
 
 public class Account {
 
-    private BigDecimal balance;
-    private final String name;
     private final String id;
+    private final String name;
+    private BigDecimal balance;
     private boolean roundUpEnabled;
 
-
-
-    public Account(String id, String name, BigDecimal startingBalance, Boolean roundUpEnabled){
-        balance = startingBalance;
-        this.name = name;
+    /** A basic class for Account information
+     * @param id The Account UUID
+     * @param name The Account holders name
+     * @param startingBalance The Account's starting balance
+     * @param roundUpEnabled Whether we round an Account's balance up
+    */
+    public Account(String id, String name, BigDecimal startingBalance, Boolean roundUpEnabled) {
         this.id = id;
-        if(roundUpEnabled){balance = balance.setScale(2, RoundingMode.HALF_UP);}
-        else{balance = balance.setScale(2, RoundingMode.HALF_DOWN);}
+        this.name = name;
+        this.balance = startingBalance;
+        this.roundUpEnabled = roundUpEnabled;
+
+        this.balance = (this.roundUpEnabled)
+                ? this.balance.setScale(2, RoundingMode.HALF_UP)
+                : this.balance.setScale(2, RoundingMode.HALF_DOWN);
     }
 
-
+    /** Deposit money into an Account
+     * @param amount The amount to deposit
+    */
     public void deposit(BigDecimal amount) {
-        balance = balance.add(amount);
-        balance = balance.setScale(2, RoundingMode.HALF_UP);
+        this.balance = this.balance.add(amount);
+        this.balance = this.balance.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public void withdraw(BigDecimal amount) throws ArithmeticException{
-        if(balance.subtract(amount).compareTo(BigDecimal.valueOf(0)) >= 0 ){
-            balance = balance.subtract(amount);
-        } else{
+    /** Withdraw an amount from the Account
+     * @param amount The amount to withdraw
+     * @throws ArithmeticException Thrown during exceptional arithmetic conditions
+     */
+    public void withdraw(BigDecimal amount) throws ArithmeticException {
+        if(this.balance.subtract(amount).compareTo(BigDecimal.valueOf(0)) >= 0) {
+            this.balance = this.balance.subtract(amount);
+        }
+
+        else {
             throw new ArithmeticException();
         }
     }
 
+    /** Get an accounts balance
+     * @return The accounts balance
+    */
     public BigDecimal getBalance() {
-
-        System.out.println(balance);
-        return balance;
+        return this.balance;
     }
 
-    public String getName(){return name;}
+    /** Get an Account holder's name
+     * @return The Account holder's name
+    */
+    public String getName() { return this.name; }
 
-    public String toString(){
-        return "Name: " + name + " \nBalance: " + balance;
+    /** Stringify an Account's information
+     * @return A String holding Account information
+    */
+    public String toString() {
+        return "Name: " + this.name + " \nBalance: " + this.balance;
     }
-
 }

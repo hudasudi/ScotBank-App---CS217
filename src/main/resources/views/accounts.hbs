@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Accounts API</title>
+
+        <link
+                rel="stylesheet"
+                href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+                integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+                crossorigin="anonymous"
+        >
+
+        <style>
+            :root {
+                --bg-clr: #111;
+                --txt-clr: #fff;
+            }
+
+            body {
+                background-color: var(--bg-clr);
+                color: var(--txt-clr);
+                font-size: 1rem;
+            }
+
+            h1.page-title {
+                margin: 50px;
+                margin-bottom: 20px;
+            }
+
+            div.accounts-list {
+                display: flex;
+                justify-content: center;
+            }
+
+            div.account-widget {
+                background-color: #0E402D;
+                padding: 20px;
+                border-radius: 10px;
+                margin: 20px;
+            }
+
+            div.account-widget h3.account-name {
+                font-size: 1.25rem;
+            }
+
+            div.account-widget div.acc-info {
+                padding: 10px;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="page-title">Accounts</h1>
+
+        <div class="accounts-list">
+            {{#each account_chunks}}
+            <div class="list-column">
+                {{#each this}}
+                <div class="account-widget">
+                    <h3 class="account-name"><b>{{name}}</b></h3>
+
+                    <div class="acc-info">
+                        <p class="account-uuid">UUID: <b>{{uuid}}</b></p>
+                        <p class="account-bal">BALANCE: £<b>{{bal}}</b></p>
+                        <p class="account-round">ROUND UP: <b>{{round}}</b></p>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{/each}}
+        </div>
+
+        <script
+                src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+                integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+                crossorigin="anonymous"
+        ></script>
+    </body>
+</html>

@@ -1,23 +1,23 @@
 package uk.co.asepstrath.bank;
 
 import io.jooby.netty.NettyServer;
-import uk.co.asepstrath.bank.example.ExampleController;
 import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.api.AccountAPIParser;
 import uk.co.asepstrath.bank.example.ExampleController_;
+import uk.co.asepstrath.bank.view.AccountController_;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class App extends Jooby {
-
-    private static Account[] list;
+    private AccountAPIParser parser;
 
     {
         /*
@@ -42,6 +42,7 @@ public class App extends Jooby {
         Logger log = getLog();
 
         mvc(new ExampleController_(ds, log));
+        mvc(new AccountController_(log));
 
         /*
         Finally we register our application lifecycle methods
@@ -54,46 +55,42 @@ public class App extends Jooby {
         runApp(args, App::new);
     }
 
-    /*
-    This function will be called when the application starts up,
-    it should be used to ensure that the DB is properly setup
+    /** This function is called on program startup, it should ensure that a DB is properly set up & API information is retrieved successfully
      */
     public void onStart() {
         Logger log = getLog();
         log.info("Starting Up...");
 
+        log.info("Attempting to retrieve API information");
+
+        parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", "src/main/resources/api/api.json");
+        parser.writeAPIInformation();
+
+        log.info("Successfully retrieved & stored API information");
+
         // Fetch DB Source
         DataSource ds = require(DataSource.class);
+
         // Open Connection to DB
         try (Connection connection = ds.getConnection()) {
-            //
             Statement stmt = connection.createStatement();
+
             stmt.executeUpdate("CREATE TABLE `Example` (`Key` varchar(255),`Value` varchar(255))");
             stmt.executeUpdate("INSERT INTO Example " + "VALUES ('WelcomeMessage', 'Welcome to A Bank')");
-        } catch (SQLException e) {
-            log.error("Database Creation Error",e);
         }
 
-        this.list = new Account[]{
-                new Account("3280489038","Rachel", BigDecimal.valueOf(50),true),
-                new Account("1882587483","Monica", BigDecimal.valueOf(100),true),
-                new Account("8784973589","Phoebe", BigDecimal.valueOf(76),true),
-                new Account("3829758782","Joey", BigDecimal.valueOf(23.90),true),
-                new Account("3897584378","Chandler", BigDecimal.valueOf(3),true),
-                new Account("8297589748","Ross", BigDecimal.valueOf(54.32),true),
-        };
+        catch (SQLException e) {
+            log.error("Database Creation Error", e);
+        }
     }
 
-
-    /*
-    This function will be called when the application shuts down
+    /** This function is called upon program shutdown
      */
     public void onStop() {
-        System.out.println("Shutting Down...");
-    }
+        Logger log = getLog();
 
-    public static Account[] getList(){
-        return list;
-    }
+        log.info("Shutting Down...");
 
+        parser.removeAPIInformation();
+    }
 }
