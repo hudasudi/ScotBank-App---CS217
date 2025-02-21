@@ -96,7 +96,7 @@ public class AccountAPIManipulator {
 	 * @param object The JsonObject to convert
 	 * @return A map of all the JsonObject's Key-Value Pairs
 	*/
-	private Map<String, String> createJsonMap(JsonObject object) {
+	public Map<String, String> createJsonMap(JsonObject object) {
 		// The account map for the JsonObject
 		Map<String, String> map = new HashMap<>();
 

@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.App;
 import uk.co.asepstrath.bank.view.AccountController;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
@@ -35,13 +34,13 @@ public class AccountControllerTests {
     }
 
     @Test
-    public void checkAccountsObject(int serverPort) {
+    public void checkGetAccount(int serverPort) {
         AccountController control = new AccountController(mock(Logger.class), "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
 
-        assertNotNull(control.accountsObject(0));
+        assertNotNull(control.getAccount("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", false));
 
         Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/account-object?pos=0")
+                .url("http://localhost:"+serverPort+"/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2&is_admin=false")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
