@@ -103,7 +103,7 @@ public class AccountAPIParser {
     */
     public void removeAPIInformation() {
         try {
-            File api_info = new File("src/main/resources/assets/api.json");
+            File api_info = new File(API_FILE);
 
             if(api_info.delete()) {
                 System.out.println("API File deleted successfully");
