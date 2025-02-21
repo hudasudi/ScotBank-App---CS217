@@ -89,7 +89,7 @@ public class ExampleController {
     https://handlebarsjs.com/guide/
      */
     @GET("/dice")
-    public ModelAndView dice(@QueryParam String name) {
+    public ModelAndView<Map<String, Object>> dice(@QueryParam String name) {
 
         // If no name has been sent within the query URL
         if (name == null) {
@@ -103,7 +103,7 @@ public class ExampleController {
         model.put("random", new Random().nextInt(6));
         model.put("name", name);
 
-        return new ModelAndView("dice.hbs", model);
+        return new ModelAndView<>("dice.hbs", model);
 
     }
 

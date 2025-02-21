@@ -11,7 +11,6 @@ import uk.co.asepstrath.bank.example.ExampleController_;
 import uk.co.asepstrath.bank.view.AccountController_;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
