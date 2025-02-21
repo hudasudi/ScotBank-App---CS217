@@ -42,7 +42,7 @@ public class App extends Jooby {
         Logger log = getLog();
 
         mvc(new ExampleController_(ds, log));
-        mvc(new AccountController_(log));
+        mvc(new AccountController_(log, "src/main/resources/api/api.json"));
 
         /*
         Finally we register our application lifecycle methods

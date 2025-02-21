@@ -22,9 +22,9 @@ public class Account {
         this.balance = startingBalance;
         this.roundUpEnabled = roundUpEnabled;
 
-        this.balance = (this.roundUpEnabled)
-                ? this.balance.setScale(2, RoundingMode.HALF_UP)
-                : this.balance.setScale(2, RoundingMode.HALF_DOWN);
+//        this.balance = (this.roundUpEnabled)
+//                ? this.balance.setScale(2, RoundingMode.HALF_UP)
+//                : this.balance.setScale(2, RoundingMode.HALF_DOWN);
     }
 
     /** Deposit money into an Account
@@ -32,7 +32,7 @@ public class Account {
     */
     public void deposit(BigDecimal amount) {
         this.balance = this.balance.add(amount);
-        this.balance = this.balance.setScale(2, RoundingMode.HALF_UP);
+//        this.balance = this.balance.setScale(2, RoundingMode.HALF_UP);
     }
 
     /** Withdraw an amount from the Account
@@ -53,6 +53,9 @@ public class Account {
      * @return The accounts balance
     */
     public BigDecimal getBalance() {
+
+        this.balance = this.balance.setScale(2, RoundingMode.HALF_DOWN);
+
         return this.balance;
     }
 
@@ -65,6 +68,7 @@ public class Account {
      * @return A String holding Account information
     */
     public String toString() {
+        this.balance = this.balance.setScale(2,RoundingMode.HALF_DOWN);
         return "Name: " + this.name + " \nBalance: " + this.balance;
     }
 }
