@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.App;
 import uk.co.asepstrath.bank.view.AccountController;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -22,7 +20,7 @@ public class AccountControllerTests {
 
     @Test
     public void checkAccountsObjects(int serverPort) {
-        AccountController control = new AccountController(mock(Logger.class));
+        AccountController control = new AccountController(mock(Logger.class), "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
 
         assertNotNull(control.accountsObjects());
 
@@ -42,7 +40,7 @@ public class AccountControllerTests {
 
     @Test
     public void checkAccountsObject(int serverPort) {
-        AccountController control = new AccountController(mock(Logger.class));
+        AccountController control = new AccountController(mock(Logger.class), "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
 
         assertNotNull(control.accountsObject(0));
 
@@ -62,7 +60,7 @@ public class AccountControllerTests {
 
     @Test
     public void checkGetAccounts(int serverPort) {
-        AccountController control = new AccountController(mock(Logger.class));
+        AccountController control = new AccountController(mock(Logger.class), "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
 
         assertNotNull(control.getAccounts());
 

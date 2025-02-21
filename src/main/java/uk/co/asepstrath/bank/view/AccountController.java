@@ -19,9 +19,9 @@ public class AccountController {
 	/** This class controls the Jooby formatting & deployment of pages to the site
 	 * @param log The program log
 	 */
-	public AccountController(Logger log) {
+	public AccountController(Logger log, String api_file) {
 		this.log = log;
-		this.manip = new AccountAPIManipulator(log, "src/main/resources/api/api.json");
+		this.manip = new AccountAPIManipulator(log, api_file);
 	}
 
 	/** Get & populate the handlebars template with information from the API file
