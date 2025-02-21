@@ -16,11 +16,11 @@ public class AccountAPIParserTests {
     @Test
     public void shouldWriteCorrectly() {
         try {
-            AccountAPIParser parser = new AccountAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/accounts", "src/main/resources/api/api.json");
+            AccountAPIParser parser = new AccountAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/accounts", "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
 
             parser.writeAPIInformation();
 
-            AccountAPIManipulator manip = new AccountAPIManipulator(mock(Logger.class), "src/main/resources/api/api.json");
+            AccountAPIManipulator manip = new AccountAPIManipulator(mock(Logger.class), "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
 
             assertNotNull(manip.getApiInformation());
 
