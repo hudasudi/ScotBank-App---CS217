@@ -12,12 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.App;
+import java.util.*;
 
 /*
     Example Controller is a Controller from the MVC paradigm.
@@ -34,23 +29,20 @@ public class ExampleController {
     This constructor can take in any dependencies the controller may need to respond to a request
      */
     public ExampleController(DataSource ds, Logger log) {
-        dataSource = ds;
-        logger = log;
+        this.dataSource = ds;
+        this.logger = log;
     }
 
-    /*
-    This is the simplest action a controller can perform
-    The @GET annotation denotes that this function should be invoked when a GET HTTP request is sent to <host>/example
-    The returned string will then be sent to the requester
-     */
+    /** This is the simplest action a controller can perform. The @GET annotation denotes that this function should be invoked when a GET HTTP request is send to <host>/example. The returned string will then be sent to the requester
+     * @return String with the output to the requester
+    */
     @GET
     public String welcome() {
         return "Welcome to Jooby!";
     }
 
-    /*
-    This @Get annotation takes an optional path parameter which denotes the function should be invoked on GET <host>/example/hello
-    Note that this function makes it's own request to another API (http://faker.hook.io/) and returns the response
+    /** This @GET annotation takes an optional path parameter which denotes the function should be invoked on GET<host>/example/hello. Note that this function makes its own request to another API (https://faker.hook.io/) & returns the response
+     * @return The response from the link
      */
     @GET("/hello")
     public String sayHi() {
@@ -113,17 +105,6 @@ public class ExampleController {
 
         return new ModelAndView("dice.hbs", model);
 
-    }
-
-    @GET("/data")
-    public String data(){
-        Account[] array = App.getList();
-        StringBuilder out = new StringBuilder();
-        for(Account a: array){
-            out.append(a.toString() + "\n\n");
-        }
-
-        return out.toString();
     }
 
     /*

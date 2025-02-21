@@ -13,7 +13,7 @@ public class AccountTests {
 
     @BeforeEach
     void setUp(){
-        a = new Account("Test",BigDecimal.ZERO);
+        a = new Account("ID","NAME",BigDecimal.ZERO,true);
     }
     @Test
     public void createAccount(){
@@ -65,10 +65,22 @@ public class AccountTests {
         assertEquals(a.getBalance(),BigDecimal.valueOf(23.01).setScale(2, RoundingMode.HALF_UP));
     }
 
+
     @Test
-    public void output(){
-        a = new Account("Damian", 50);
-        assertEquals("Name: Damian \nBalance: 50.00", a.toString());
+    public void roundUpTrue(){
+        a = new Account("ID","NAME",BigDecimal.ZERO,true);
+        a.deposit(BigDecimal.valueOf(2.55555));
+        assertEquals(BigDecimal.valueOf(2.56),a.getBalance());
+    }
+
+    @Test
+    public void nameTest(){
+        assertEquals("NAME", a.getName());
+    }
+
+    @Test
+    public void toStringTest(){
+        assertEquals("Name: NAME \nBalance: 0.00",a.toString());
     }
 
 }
