@@ -140,9 +140,6 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M3</version>
-                <configuration>
-                   <!--<argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.15.2/mockito-core-5.15.2.jar &#45;&#45;add-opens java.base/java.lang=ALL-UNNAMED -XX:+EnableDynamicAgentLoading</argLine>-->
-                </configuration>
             </plugin>
             <!-- jooby:run -->
             <plugin>
