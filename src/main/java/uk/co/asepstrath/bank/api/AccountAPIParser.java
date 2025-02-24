@@ -3,28 +3,28 @@ package uk.co.asepstrath.bank.api;
 import com.google.gson.*;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileWriter;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.*;
 
 public class AccountAPIParser {
     private final String API_URL;
-    private final String API_FILE;
     private final Logger log;
+    private final DataSource ds;
 
     /** This class takes the API URL, gets the response & parses it into a usable format for other functions
      * @param api_url The URL to the API
-     * @param api_file The PATH for the file to be populated with API information
+     * @param ds The DataSource to write to
      * @param log The program log
     */
-    public AccountAPIParser(Logger log, String api_url, String api_file) {
+    public AccountAPIParser(Logger log, String api_url, DataSource ds) {
         this.API_URL = api_url;
-        this.API_FILE = api_file;
         this.log = log;
+        this.ds = ds;
     }
 
     /**
@@ -75,47 +75,41 @@ public class AccountAPIParser {
         }
     }
 
-    /** Write the API JSON response to a file for use later
+    /**
+     * Write the API JSON response to the db for use later
      */
     public void writeAPIInformation() {
         JsonArray response_array = this.parseJSONResponse();
 
-        try {
-            File file = new File(this.API_FILE);
-            file.createNewFile();
-        }
+        try(Connection conn = this.ds.getConnection()) {
+            String insert_acc = "INSERT INTO Accounts " + "VALUES (?, ?, ?, ?)";
 
-        catch(IOException e) {
-            log.error("An error occurred whilst creating the API information file", e);
-            return;
-        }
+            PreparedStatement stmt = conn.prepareStatement(insert_acc);
 
-        try(FileWriter writer = new FileWriter(this.API_FILE)) {
-            writer.write(response_array.toString());
-        }
+            for(int i = 0; i < response_array.size(); i++) {
+                JsonObject obj = response_array.get(i).getAsJsonObject();
 
-        catch(IOException e) {
-            log.error("An error occurred whilst trying to write API information to the JSON file", e);
+                stmt.setString(1, removeQuotes(obj.get("id").toString()));
+                stmt.setString(2, removeQuotes(obj.get("name").toString()));
+                stmt.setDouble(3, obj.get("startingBalance").getAsDouble());
+                stmt.setBoolean(4, obj.get("roundUpEnabled").getAsBoolean());
+
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+
+            stmt.close();
+            conn.close();
+
+            log.info("Successfully wrote API information to the database");
+
+        } catch (SQLException e) {
+			log.error("An error occurred whilst trying to write API information to the database", e);
         }
     }
 
-    /** On stopping the program, this function will wipe the account information from the file
-    */
-    public void removeAPIInformation() {
-        try {
-            File api_info = new File(API_FILE);
-
-            if(api_info.delete()) {
-                System.out.println("API File deleted successfully");
-            }
-
-            else {
-                throw new IOException();
-            }
-        }
-
-        catch(IOException e) {
-            log.error("An error occurred whilst trying to delete the API file", e);
-        }
+    private String removeQuotes(String str) {
+        return str.substring(1, str.length() - 1);
     }
 }

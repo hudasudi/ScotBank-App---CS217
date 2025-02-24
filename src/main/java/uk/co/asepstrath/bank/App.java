@@ -13,6 +13,7 @@ import uk.co.asepstrath.bank.view.AccountController_;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -42,7 +43,7 @@ public class App extends Jooby {
         Logger log = getLog();
 
         mvc(new ExampleController_(ds, log));
-        mvc(new AccountController_(log, "src/main/resources/api/api.json"));
+        mvc(new AccountController_(log, ds));
 
         /*
         Finally we register our application lifecycle methods
@@ -63,20 +64,19 @@ public class App extends Jooby {
 
         log.info("Attempting to retrieve API information");
 
-        parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", "src/main/resources/api/api.json");
-        parser.writeAPIInformation();
-
-        log.info("Successfully retrieved & stored API information");
-
         // Fetch DB Source
         DataSource ds = require(DataSource.class);
 
         // Open Connection to DB
-        try (Connection connection = ds.getConnection()) {
+        try(Connection connection = ds.getConnection()) {
             Statement stmt = connection.createStatement();
 
-            stmt.executeUpdate("CREATE TABLE `Example` (`Key` varchar(255),`Value` varchar(255))");
-            stmt.executeUpdate("INSERT INTO Example " + "VALUES ('WelcomeMessage', 'Welcome to A Bank')");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Accounts` (`UUID` varchar(255), `Name` varchar(255), `Balance` double, `roundUpEnabled` bit)");
+
+            stmt.close();
+
+            parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", ds);
+            parser.writeAPIInformation();
         }
 
         catch (SQLException e) {
@@ -90,7 +90,5 @@ public class App extends Jooby {
         Logger log = getLog();
 
         log.info("Shutting Down...");
-
-        parser.removeAPIInformation();
     }
 }

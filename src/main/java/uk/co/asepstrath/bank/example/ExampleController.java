@@ -54,17 +54,17 @@ public class ExampleController {
      */
     @GET("/welcome")
     public String welcomeFromDB() {
-        String welcomeMessageKey = "WelcomeMessage";
+        String welcomeMessageKey = "c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2";
         // Create a connection
         try (Connection connection = dataSource.getConnection()) {
             // Create Statement (batch of SQL Commands)
             Statement statement = connection.createStatement();
             // Perform SQL Query
-            ResultSet set = statement.executeQuery("SELECT * FROM `Example` Where `Key` = '"+welcomeMessageKey+"'");
+            ResultSet set = statement.executeQuery("SELECT * FROM `Accounts`");
             // Read First Result
             set.next();
             // Extract value from Result
-            String welcomeMessage = set.getString("Value");
+            String welcomeMessage = set.getString("Name");
             // Return value
             return welcomeMessage;
         } catch (SQLException e) {

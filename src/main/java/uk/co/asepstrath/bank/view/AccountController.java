@@ -11,17 +11,21 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.slf4j.Logger;
 
+import javax.sql.DataSource;
+
 @Path("/accounts")
 public class AccountController {
 	private final AccountAPIManipulator manip;
 	private final Logger log;
+	private final DataSource ds;
 
 	/** This class controls the Jooby formatting & deployment of pages to the site
 	 * @param log The program log
 	 */
-	public AccountController(Logger log, String api_file) {
+	public AccountController(Logger log, DataSource ds) {
 		this.log = log;
-		this.manip = new AccountAPIManipulator(log, api_file);
+		this.manip = new AccountAPIManipulator(log, ds);
+		this.ds = ds;
 	}
 
 	/** Get & populate the handlebars template with information from the API file
@@ -29,7 +33,7 @@ public class AccountController {
 	*/
 	@GET("/account-view")
 	public ModelAndView getAccounts() {
-		Map<String, Object> model = manip.createHandleBarsJSONMap();
+		Map<String, Object> model = this.manip.createHandleBarsJSONMap();
 
 		return new ModelAndView("accounts.hbs", model);
 	}
@@ -39,7 +43,7 @@ public class AccountController {
 	*/
 	@GET("/account-objects")
 	public String accountsObjects() {
-		ArrayList<Account> array = manip.jsonToAccounts();
+		ArrayList<Account> array = this.manip.jsonToAccounts();
 
 		StringBuilder out = new StringBuilder();
 
@@ -56,7 +60,7 @@ public class AccountController {
 	 */
 	@GET("/account-object")
 	public String accountsObject(@QueryParam int pos) {
-		ArrayList<Account> array = manip.jsonToAccounts();
+		ArrayList<Account> array = this.manip.jsonToAccounts();
 
 		return array.get(pos).toString();
 	}

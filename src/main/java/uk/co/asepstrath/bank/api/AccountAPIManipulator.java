@@ -6,37 +6,59 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
+import javax.sql.DataSource;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AccountAPIManipulator {
-	private final String API_FILE;
 	private final Logger log;
+	private final DataSource ds;
 
 	/** This class manipulates API information to format it into varied forms
 	 * @param log The program log
 	 * @param api_file The PATH location for the API file during runtime
 	*/
-	public AccountAPIManipulator(Logger log, String api_file) {
+	public AccountAPIManipulator(Logger log, DataSource ds) {
 		this.log = log;
-		this.API_FILE = api_file;
+		this.ds = ds;
 	}
 
-	/** Get the API information stored in the JSON file, parse it into a JsonArray & return it
+	/** Get the API information stored in db, parse it into a JsonArray & return it
 	 * @return The API Information
 	*/
 	public JsonArray getApiInformation() {
-		try {
-			Gson gson = new Gson();
+		JsonArray arr = new JsonArray();
 
-			return gson.fromJson(new FileReader(API_FILE), JsonArray.class);
+		try(Connection conn = this.ds.getConnection()) {
+			Statement stmt = conn.createStatement();
 
-		} catch(IOException e) {
-			log.error("Error whilst getting API information", e);
+			ResultSet set = stmt.executeQuery("SELECT * FROM Accounts");
+
+			while(set.next()) {
+				JsonObject obj_to_insert = new JsonObject();
+
+				obj_to_insert.addProperty("id", set.getString("UUID"));
+				obj_to_insert.addProperty("name", set.getString("Name"));
+				obj_to_insert.addProperty("startingBalance", set.getDouble("Balance"));
+				obj_to_insert.addProperty("roundUpEnabled", set.getBoolean("roundUpEnabled"));
+
+				arr.add(obj_to_insert);
+			}
+
+			stmt.close();
+			conn.close();
+
+			return arr;
+		} catch(SQLException e) {
+			log.error("An error occurred whilst trying to retrieve API information from the database", e);
 			return null;
 		}
 	}
