@@ -11,9 +11,15 @@ import uk.co.asepstrath.bank.view.AccountController;
 
 import javax.sql.DataSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @JoobyTest(App.class)
 public class AccountControllerTests {
@@ -22,7 +28,30 @@ public class AccountControllerTests {
 
     @Test
     public void checkAccountsObjects(int serverPort) {
-        AccountController control = new AccountController(mock(Logger.class), mock(DataSource.class));
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        Statement mockStatement = mock(Statement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        try {
+            when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        } catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+        try {
+            when(mockConnection.createStatement()).thenReturn(mockStatement);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+		AccountController control = new AccountController(mock(Logger.class), mockDataSource);
 
 		// ISSUE WITH CONNECTION BECAUSE MOCKING IT
         assertNotNull(control.accountsObjects());
@@ -39,7 +68,40 @@ public class AccountControllerTests {
 
     @Test
     public void checkAccountsObject(int serverPort) {
-        AccountController control = new AccountController(mock(Logger.class), mock(DataSource.class));
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        Statement mockStatement = mock(Statement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        try {
+            when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockConnection.createStatement()).thenReturn(mockStatement);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+            when(mockResultSet.getString(1)).thenReturn("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
+            when(mockResultSet.getString(2)).thenReturn("Miss Lavina Waelchi");
+            when(mockResultSet.getDouble(3)).thenReturn(544.91);
+            when(mockResultSet.getString(4)).thenReturn("No");
+        } catch (SQLException e) {
+            e.printStackTrace();
+		}
+
+		AccountController control = new AccountController(mock(Logger.class), mockDataSource);
 
         assertNotNull(control.accountsObject(0));
 
@@ -55,7 +117,40 @@ public class AccountControllerTests {
 
     @Test
     public void checkGetAccounts(int serverPort) {
-        AccountController control = new AccountController(mock(Logger.class), mock(DataSource.class));
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        Statement mockStatement = mock(Statement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        try {
+            when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockConnection.createStatement()).thenReturn(mockStatement);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+            when(mockResultSet.getString(1)).thenReturn("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
+            when(mockResultSet.getString(2)).thenReturn("Miss Lavina Waelchi");
+            when(mockResultSet.getDouble(3)).thenReturn(544.91);
+            when(mockResultSet.getString(4)).thenReturn("No");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        AccountController control = new AccountController(mock(Logger.class), mockDataSource);
 
         assertNotNull(control.getAccounts());
 
