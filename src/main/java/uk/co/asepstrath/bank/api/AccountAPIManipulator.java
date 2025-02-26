@@ -1,14 +1,11 @@
 package uk.co.asepstrath.bank.api;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
 import javax.sql.DataSource;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +21,7 @@ public class AccountAPIManipulator {
 
 	/** This class manipulates API information to format it into varied forms
 	 * @param log The program log
-	 * @param api_file The PATH location for the API file during runtime
+	 * @param ds The DataSource to pull info from
 	*/
 	public AccountAPIManipulator(Logger log, DataSource ds) {
 		this.log = log;
@@ -118,7 +115,7 @@ public class AccountAPIManipulator {
 	 * @param object The JsonObject to convert
 	 * @return A map of all the JsonObject's Key-Value Pairs
 	*/
-	private Map<String, String> createJsonMap(JsonObject object) {
+	public Map<String, String> createJsonMap(JsonObject object) {
 		// The account map for the JsonObject
 		Map<String, String> map = new HashMap<>();
 

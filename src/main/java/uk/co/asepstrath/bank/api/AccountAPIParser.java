@@ -77,7 +77,7 @@ public class AccountAPIParser {
 
     /**
      * Write the API JSON response to the db for use later
-     */
+    */
     public void writeAPIInformation() {
         JsonArray response_array = this.parseJSONResponse();
 

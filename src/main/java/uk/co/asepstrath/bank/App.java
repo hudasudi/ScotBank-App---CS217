@@ -7,7 +7,6 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.api.AccountAPIParser;
-import uk.co.asepstrath.bank.example.ExampleController_;
 import uk.co.asepstrath.bank.view.AccountController_;
 
 import javax.sql.DataSource;
@@ -40,7 +39,6 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        mvc(new ExampleController_(ds, log));
         mvc(new AccountController_(log, ds));
 
         /*
@@ -77,7 +75,7 @@ public class App extends Jooby {
             parser.writeAPIInformation();
         }
 
-        catch (SQLException e) {
+        catch(SQLException e) {
             log.error("Database Creation Error", e);
         }
     }

@@ -1,22 +1,28 @@
 package uk.co.asepstrath.bank.account_tests;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.jooby.test.JoobyTest;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.App;
+import uk.co.asepstrath.bank.api.AccountAPIManipulator;
 import uk.co.asepstrath.bank.view.AccountController;
 
 import javax.sql.DataSource;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,139 +34,191 @@ public class AccountControllerTests {
 
     @Test
     public void checkAccountsObjects(int serverPort) {
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
-        Statement mockStatement = mock(Statement.class);
-        ResultSet mockResultSet = mock(ResultSet.class);
+        // Mock Manipulator & Insert into Controller
+        AccountAPIManipulator mockManipulator = mock(AccountAPIManipulator.class);
+        AccountController control = new AccountController(mock(Logger.class), null);
+        control.setAccountAPIManipulator(mockManipulator);
 
-        try {
-            when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        } catch (SQLException e) {
-			e.printStackTrace();
-		}
+        // Create fake data to test against
+        ArrayList<Account> mockAccounts = new ArrayList<>();
+        mockAccounts.add(new Account("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", "Miss Lavina Waelchi", BigDecimal.valueOf(544.91), false));
+        when(mockManipulator.jsonToAccounts()).thenReturn(mockAccounts);
 
-        try {
-            when(mockConnection.createStatement()).thenReturn(mockStatement);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
+        // Check raw output
+        String accountData = control.accountsObjects();
 
-        try {
-            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
+        assertNotNull(accountData);
+        assertTrue(accountData.contains("Miss Lavina Waelchi"));
+        assertTrue(accountData.contains("544.91"));
 
-		AccountController control = new AccountController(mock(Logger.class), mockDataSource);
-
-		// ISSUE WITH CONNECTION BECAUSE MOCKING IT
-        assertNotNull(control.accountsObjects());
-
+        // Check HTTP output
         Request req = new Request.Builder()
                 .url("http://localhost:"+serverPort+"/accounts/account-objects")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
-
-        } catch (Exception ignored) {}
+            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
+            assertTrue(rsp.body().string().contains("544.91"));
+        } catch(Exception ignored) {}
     }
 
     @Test
     public void checkAccountsObject(int serverPort) {
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
-        Statement mockStatement = mock(Statement.class);
-        ResultSet mockResultSet = mock(ResultSet.class);
+        // Mock Manipulator & Insert into Controller
+        AccountAPIManipulator mockManipulator = mock(AccountAPIManipulator.class);
+        AccountController control = new AccountController(mock(Logger.class), null);
+        control.setAccountAPIManipulator(mockManipulator);
 
-        try {
-            when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Create fake data to test against
+        ArrayList<Account> mockAccounts = new ArrayList<>();
+        mockAccounts.add(new Account("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", "Miss Lavina Waelchi", BigDecimal.valueOf(544.91), false));
+        when(mockManipulator.jsonToAccounts()).thenReturn(mockAccounts);
 
-        try {
-            when(mockConnection.createStatement()).thenReturn(mockStatement);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
+        // Check raw output
+        String accountData = control.accountsObject(0);
 
-        try {
-            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
+        assertNotNull(accountData);
+        assertTrue(accountData.contains("Miss Lavina Waelchi"));
+        assertTrue(accountData.contains("544.91"));
 
-        try {
-            when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-            when(mockResultSet.getString(1)).thenReturn("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
-            when(mockResultSet.getString(2)).thenReturn("Miss Lavina Waelchi");
-            when(mockResultSet.getDouble(3)).thenReturn(544.91);
-            when(mockResultSet.getString(4)).thenReturn("No");
-        } catch (SQLException e) {
-            e.printStackTrace();
-		}
-
-		AccountController control = new AccountController(mock(Logger.class), mockDataSource);
-
-        assertNotNull(control.accountsObject(0));
-
+        // Check HTTP output
         Request req = new Request.Builder()
                 .url("http://localhost:"+serverPort+"/accounts/account-object?pos=0")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
-
-        } catch (Exception ignored) {}
+            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
+            assertTrue(rsp.body().string().contains("544.91"));
+        } catch(Exception ignored) {}
     }
 
+    // THIS TEST DOESNT WORK PER SE
     @Test
     public void checkGetAccounts(int serverPort) {
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
-        Statement mockStatement = mock(Statement.class);
-        ResultSet mockResultSet = mock(ResultSet.class);
+        // Somehow the code inside here is reaching through time & space to take db info that's not there & output it (that's why the test passes)
 
-        try {
-            when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Mock Manipulator & Insert into Controller
+        AccountAPIManipulator mockManipulator = mock(AccountAPIManipulator.class);
+        AccountController control = new AccountController(mock(Logger.class), null);
+        control.setAccountAPIManipulator(mockManipulator);
 
-        try {
-            when(mockConnection.createStatement()).thenReturn(mockStatement);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
+        // Fake data to test
+        JsonArray arr = new JsonArray();
+        JsonObject obj = new JsonObject();
 
-        try {
-            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
+        obj.addProperty("uuid", "c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
+        obj.addProperty("name", "Miss Lavina Waelchi");
+        obj.addProperty("balance", 544.91);
+        obj.addProperty("roundUpEnabled", false);
 
-        try {
-            when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-            when(mockResultSet.getString(1)).thenReturn("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
-            when(mockResultSet.getString(2)).thenReturn("Miss Lavina Waelchi");
-            when(mockResultSet.getDouble(3)).thenReturn(544.91);
-            when(mockResultSet.getString(4)).thenReturn("No");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        arr.add(obj);
 
-        AccountController control = new AccountController(mock(Logger.class), mockDataSource);
+        when(mockManipulator.getApiInformation()).thenReturn(arr);
 
+        // Check raw output
         assertNotNull(control.getAccounts());
 
+        // Check HTTP output
         Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/accounts-view")
+                .url("http://localhost:"+serverPort+"/accounts/account-view")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
 
+            assertTrue(rsp.body().string().contains("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2"));
+            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
+            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("No"));
+
         } catch(Exception ignored) {}
+    }
+
+	// THIS TEST DOESNT WORK PER SE
+    @Test
+    public void checkGetAccount(int serverPort) {
+		// Somehow the code inside here is reaching through time & space to take db info that's not there & output it (that's why the test passes)
+
+        // Mock Manipulator & Insert into Controller
+        AccountAPIManipulator mockManipulator = mock(AccountAPIManipulator.class);
+        AccountController control = new AccountController(mock(Logger.class), null);
+        control.setAccountAPIManipulator(mockManipulator);
+
+        // Fake data to test
+        JsonArray arr = new JsonArray();
+        JsonObject obj = new JsonObject();
+
+        obj.addProperty("id", "c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
+        obj.addProperty("name", "Miss Lavina Waelchi");
+        obj.addProperty("balance", 544.91);
+        obj.addProperty("roundUpEnabled", false);
+
+        arr.add(obj);
+
+        when(mockManipulator.getApiInformation()).thenReturn(arr);
+
+        // Check raw output
+        assertNotNull(control.getAccount("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", false));
+
+        // Check HTTP output
+
+        // is_admin = false
+        Request req = new Request.Builder()
+                .url("http://localhost:" + serverPort + "/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2&is_admin=false")
+                .build();
+
+        try(Response rsp = client.newCall(req).execute()) {
+            assertNotNull(rsp.body());
+
+            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
+            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("No"));
+            assertTrue(rsp.body().string().contains("YOU ARE A USER"));
+
+        } catch (Exception ignored) {}
+
+        // is_admin = true
+        req = new Request.Builder()
+                .url("http://localhost:" + serverPort + "/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2&is_admin=true")
+                .build();
+
+        try(Response rsp = client.newCall(req).execute()) {
+            assertNotNull(rsp.body());
+
+            assertTrue(rsp.body().string().contains("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2"));
+            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
+            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("No"));
+            assertTrue(rsp.body().string().contains("YOU ARE AN ADMIN"));
+
+        } catch(Exception ignored) {}
+
+        // missing uuid param
+        req = new Request.Builder()
+                .url("http://localhost:" + serverPort + "/accounts/account?is_admin=true")
+                .build();
+
+        try(Response rsp = client.newCall(req).execute()) {
+            assertNotNull(rsp.body());
+
+            assertTrue(rsp.body().string().contains("400 - Bad Request"));
+            assertTrue(rsp.body().string().contains("No uuid or is_admin parameter provided!"));
+
+        } catch(Exception ignored) {}
+
+        // missing is_admin param
+        req = new Request.Builder()
+                .url("http://localhost:" + serverPort + "/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2")
+                .build();
+
+        try(Response rsp = client.newCall(req).execute()) {
+            assertNotNull(rsp.body());
+
+            assertTrue(rsp.body().string().contains("400 - Bad Request"));
+            assertTrue(rsp.body().string().contains("No uuid or is_admin parameter provided!"));
+        } catch(Exception ignored) {}
+
     }
 }
