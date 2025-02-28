@@ -68,7 +68,7 @@ public class App extends Jooby {
             Statement stmt = connection.createStatement();
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Accounts` (`UUID` varchar(255), `Name` varchar(255), `Balance` double, `roundUpEnabled` bit)");
-
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Transactions` (`Timestamp` timestamp, `Amount` double, `From` varchar(255), `TransactionId` varchar(255), `Recipient` varchar(3), `Type` varchar(255))");
             stmt.close();
 
             parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", ds);
