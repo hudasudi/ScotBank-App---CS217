@@ -2,6 +2,8 @@ package uk.co.asepstrath.bank.transactions_tests;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import org.json.JSONObject;
+import org.json.XML;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -37,12 +39,24 @@ public class TransactionAPIParserTests {
         DataSource mockDataSource = mock(DataSource.class);
 
         TransactionAPIParser parser = new TransactionAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/transactions", mockDataSource);
+        JsonParser p = new JsonParser();
 
-//        JsonParser parser2 = new JsonParser();
-//        JsonArray test = parser2.parse(parser.getAPIData(0).body()).getAsJsonObject().get("results").getAsJsonArray();
-//        System.out.println(parser2.parse(parser.getAPIData(0).body()).getAsJsonObject());
-//        System.out.println(test.get(0));
-        System.out.println(parser.getAPIData(0).body());
+        JSONObject test = XML.toJSONObject(parser.getAPIData(0).body());
+        JsonObject t = p.parse(test.toString()).getAsJsonObject();
+        JsonArray t2 = p.parse(t.get("pageResult").getAsJsonObject().get("results").toString()).getAsJsonArray();
+        System.out.println(t);
+    }
+
+    @Test
+    public void temp2(){
+        DataSource mockDataSource = mock(DataSource.class);
+
+        TransactionAPIParser parser = new TransactionAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/transactions", mockDataSource);
+
+        JsonArray test = parser.parseJSONResponse();
+
+        System.out.println(test.get(1325));
+
     }
 
 

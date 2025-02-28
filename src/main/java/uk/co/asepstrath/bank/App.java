@@ -78,9 +78,6 @@ public class App extends Jooby {
             accountParser.writeAPIInformation();
             transactionParser = new TransactionAPIParser(log, "https://api.asep-strath.co.uk/api/transactions", ds);
             transactionParser.writeAPIInformation();
-            Statement stmt2 = connection.createStatement();
-            ResultSet results = stmt2.executeQuery("SELECT * FROM `Transactions` WHERE `id` = '0043d8d9-846d-49cb-9b04-8d3823e9d8c9'");
-            System.out.println(results.toString());
         }
 
         catch(SQLException e) {

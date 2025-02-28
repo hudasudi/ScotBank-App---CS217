@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
+import org.json.*;
+import org.json.XML;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -31,8 +33,7 @@ public class TransactionAPIParser{
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(this.API_URL + "?page=" + currentPage))
-                    .header("Accept", "application/json")
+                    .uri(URI.create(this.API_URL + "?page=" + currentPage + "&size=1000"))
                     .build();
 
             return client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -50,9 +51,8 @@ public class TransactionAPIParser{
     }
 
     public void writeAPIInformation() {
-//        JsonArray response_array = this.parseJSONResponse();
+        JsonArray response_array = this.parseJSONResponse();
         JsonParser parser = new JsonParser();
-        JsonArray response_array = parser.parse(this.getAPIData(0).body().toString()).getAsJsonObject().get("results").getAsJsonArray();
         try(Connection conn = this.ds.getConnection()) {
             String insert_transac = "INSERT INTO Transactions " + "VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -60,12 +60,17 @@ public class TransactionAPIParser{
 
             for(int i = 0; i < response_array.size(); i++) {
                 JsonObject obj = response_array.get(i).getAsJsonObject();
+                System.out.println(i);
 
                 stmt.setString(1, removeQuotes(obj.get("timestamp").toString()));
                 stmt.setDouble(2, obj.get("amount").getAsDouble());
-                stmt.setString(3, removeQuotes(obj.get("from").toString()));
+                if(obj.get("from") != null) {
+                    stmt.setString(3, removeQuotes(obj.get("from").toString()));
+                }
                 stmt.setString(4, removeQuotes(obj.get("id").toString()));
-                stmt.setString(5, removeQuotes(obj.get("to").toString()));
+                if(obj.get("to") != null) {
+                    stmt.setString(5, removeQuotes(obj.get("to").toString()));
+                }
                 stmt.setString(6, removeQuotes(obj.get("type").toString()));
 
                 stmt.addBatch();
@@ -89,11 +94,13 @@ public class TransactionAPIParser{
             JsonParser parser = new JsonParser();
             boolean isLastPage = false;
             for(int i = 0; !isLastPage;i++){
-                System.out.println(i);
+                log.info("Working on api page: " + i);
                 HttpResponse<String> response = this.getAPIData(i);
 
                 if(response.statusCode() == 200) {
-                    JsonObject responseJson = parser.parse(response.body()).getAsJsonObject();
+                    JSONObject test = XML.toJSONObject(response.body());
+                    JsonObject temp = parser.parse(test.toString()).getAsJsonObject();
+                    JsonObject responseJson = parser.parse(temp.get("pageResult").toString()).getAsJsonObject();
                     isLastPage = !(responseJson.get("hasNext").getAsBoolean());
                     outArray.addAll(responseJson.get("results").getAsJsonArray());
                 } else {
