@@ -7,15 +7,18 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.api.AccountAPIParser;
+import uk.co.asepstrath.bank.api.TransactionAPIParser;
 import uk.co.asepstrath.bank.view.AccountController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class App extends Jooby {
-    private AccountAPIParser parser;
+    private AccountAPIParser accountParser;
+    private TransactionAPIParser transactionParser;
 
     {
         /*
@@ -68,11 +71,16 @@ public class App extends Jooby {
             Statement stmt = connection.createStatement();
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Accounts` (`UUID` varchar(255), `Name` varchar(255), `Balance` double, `roundUpEnabled` bit)");
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Transactions` (`Timestamp` timestamp, `Amount` double, `From` varchar(255), `TransactionId` varchar(255), `Recipient` varchar(3), `Type` varchar(255))");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Transactions` (`Timestamp` varchar(255), `Amount` double, `From` varchar(255), `TransactionId` varchar(255), `Recipient` varchar(255), `Type` varchar(255))");
             stmt.close();
 
-            parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", ds);
-            parser.writeAPIInformation();
+            accountParser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", ds);
+            accountParser.writeAPIInformation();
+            transactionParser = new TransactionAPIParser(log, "https://api.asep-strath.co.uk/api/transactions", ds);
+            transactionParser.writeAPIInformation();
+            Statement stmt2 = connection.createStatement();
+            ResultSet results = stmt2.executeQuery("SELECT * FROM `Transactions` WHERE `id` = '0043d8d9-846d-49cb-9b04-8d3823e9d8c9'");
+            System.out.println(results.toString());
         }
 
         catch(SQLException e) {

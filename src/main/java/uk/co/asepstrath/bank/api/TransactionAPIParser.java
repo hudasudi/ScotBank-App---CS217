@@ -50,20 +50,23 @@ public class TransactionAPIParser{
     }
 
     public void writeAPIInformation() {
-        JsonArray response_array = this.parseJSONResponse();
-
+//        JsonArray response_array = this.parseJSONResponse();
+        JsonParser parser = new JsonParser();
+        JsonArray response_array = parser.parse(this.getAPIData(0).body().toString()).getAsJsonObject().get("results").getAsJsonArray();
         try(Connection conn = this.ds.getConnection()) {
-            String insert_acc = "INSERT INTO Accounts " + "VALUES (?, ?, ?, ?)";
+            String insert_transac = "INSERT INTO Transactions " + "VALUES (?, ?, ?, ?, ?, ?)";
 
-            PreparedStatement stmt = conn.prepareStatement(insert_acc);
+            PreparedStatement stmt = conn.prepareStatement(insert_transac);
 
             for(int i = 0; i < response_array.size(); i++) {
                 JsonObject obj = response_array.get(i).getAsJsonObject();
 
-                stmt.setString(1, removeQuotes(obj.get("id").toString()));
-                stmt.setString(2, removeQuotes(obj.get("name").toString()));
-                stmt.setDouble(3, obj.get("startingBalance").getAsDouble());
-                stmt.setBoolean(4, obj.get("roundUpEnabled").getAsBoolean());
+                stmt.setString(1, removeQuotes(obj.get("timestamp").toString()));
+                stmt.setDouble(2, obj.get("amount").getAsDouble());
+                stmt.setString(3, removeQuotes(obj.get("from").toString()));
+                stmt.setString(4, removeQuotes(obj.get("id").toString()));
+                stmt.setString(5, removeQuotes(obj.get("to").toString()));
+                stmt.setString(6, removeQuotes(obj.get("type").toString()));
 
                 stmt.addBatch();
             }
