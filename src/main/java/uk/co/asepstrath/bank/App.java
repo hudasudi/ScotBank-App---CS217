@@ -5,9 +5,15 @@ import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
+
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.api.AccountAPIParser;
+
+import uk.co.asepstrath.bank.api.parsers.AccountAPIParser;
+import uk.co.asepstrath.bank.api.parsers.BusinessAPIParser;
+import uk.co.asepstrath.bank.api.parsers.TransactionAPIParser;
 import uk.co.asepstrath.bank.view.AccountController_;
+import uk.co.asepstrath.bank.view.BusinessController_;
+import uk.co.asepstrath.bank.view.TransactionController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -15,9 +21,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class App extends Jooby {
-    private AccountAPIParser parser;
 
-    {
+	{
         /*
         This section is used for setting up the Jooby Framework modules
          */
@@ -40,6 +45,8 @@ public class App extends Jooby {
         Logger log = getLog();
 
         mvc(new AccountController_(log, ds));
+        mvc(new BusinessController_(log, ds));
+        mvc(new TransactionController_(log, ds));
 
         /*
         Finally we register our application lifecycle methods
@@ -68,11 +75,23 @@ public class App extends Jooby {
             Statement stmt = connection.createStatement();
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Accounts` (`UUID` varchar(255), `Name` varchar(255), `Balance` double, `roundUpEnabled` bit)");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Businesses` (`ID` varchar(255), `Name` varchar(255), `Category` varchar(255), `Sanctioned` bit)");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS `Transactions` (`Timestamp` varchar(255), `Amount` double, `Sender` varchar(255), `TransactionID` varchar(255), `Recipient` varchar(255), `Type` varchar(255))");
 
             stmt.close();
 
-            parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", ds);
-            parser.writeAPIInformation();
+            log.info("Retrieving Database Information");
+
+			AccountAPIParser account_parser = new AccountAPIParser(log, "https://api.asep-strath.co.uk/api/accounts", ds);
+            account_parser.writeAPIInformation();
+
+			BusinessAPIParser business_parser = new BusinessAPIParser(log, "https://api.asep-strath.co.uk/api/businesses", ds);
+            business_parser.writeAPIInformation();
+
+			TransactionAPIParser transaction_parser = new TransactionAPIParser(log, "https://api.asep-strath.co.uk/api/transactions", ds);
+            transaction_parser.writeAPIInformation();
+
+            log.info("Retrieved Database Information Successfully");
         }
 
         catch(SQLException e) {
