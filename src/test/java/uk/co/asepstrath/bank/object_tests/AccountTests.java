@@ -1,9 +1,10 @@
-package uk.co.asepstrath.bank;
+package uk.co.asepstrath.bank.object_tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.co.asepstrath.bank.Account;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,7 +19,6 @@ public class AccountTests {
     @Test
     public void createAccount(){
         assertNotNull(a);
-
     }
 
     @Test

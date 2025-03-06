@@ -1,35 +1,28 @@
-package uk.co.asepstrath.bank.account_tests;
+package uk.co.asepstrath.bank.controller_tests;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.jooby.test.JoobyTest;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.App;
-import uk.co.asepstrath.bank.api.AccountAPIManipulator;
+import uk.co.asepstrath.bank.api.manipulators.AccountAPIManipulator;
 import uk.co.asepstrath.bank.view.AccountController;
 
-import javax.sql.DataSource;
-
 import java.math.BigDecimal;
-import java.sql.*;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @JoobyTest(App.class)
 public class AccountControllerTests {
-
     static OkHttpClient client = new OkHttpClient();
 
     @Test
@@ -41,15 +34,15 @@ public class AccountControllerTests {
 
         // Create fake data to test against
         ArrayList<Account> mockAccounts = new ArrayList<>();
-        mockAccounts.add(new Account("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", "Miss Lavina Waelchi", BigDecimal.valueOf(544.91), false));
+        mockAccounts.add(new Account("04f6ab33-8208-4234-aabd-b6a8be8493da", "Melva Rogahn", BigDecimal.valueOf(594.82), false));
         when(mockManipulator.jsonToAccounts()).thenReturn(mockAccounts);
 
         // Check raw output
         String accountData = control.accountsObjects();
 
         assertNotNull(accountData);
-        assertTrue(accountData.contains("Miss Lavina Waelchi"));
-        assertTrue(accountData.contains("544.91"));
+        assertTrue(accountData.contains("Melva Rogahn"));
+        assertTrue(accountData.contains("594.82"));
 
         // Check HTTP output
         Request req = new Request.Builder()
@@ -58,8 +51,8 @@ public class AccountControllerTests {
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
-            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
-            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("Melva Rogahn"));
+            assertTrue(rsp.body().string().contains("594.82"));
         } catch(Exception ignored) {}
     }
 
@@ -72,15 +65,15 @@ public class AccountControllerTests {
 
         // Create fake data to test against
         ArrayList<Account> mockAccounts = new ArrayList<>();
-        mockAccounts.add(new Account("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", "Miss Lavina Waelchi", BigDecimal.valueOf(544.91), false));
+        mockAccounts.add(new Account("04f6ab33-8208-4234-aabd-b6a8be8493da", "Melva Rogahn", BigDecimal.valueOf(594.82), false));
         when(mockManipulator.jsonToAccounts()).thenReturn(mockAccounts);
 
         // Check raw output
         String accountData = control.accountsObject(0);
 
         assertNotNull(accountData);
-        assertTrue(accountData.contains("Miss Lavina Waelchi"));
-        assertTrue(accountData.contains("544.91"));
+        assertTrue(accountData.contains("Melva Rogahn"));
+        assertTrue(accountData.contains("594.82"));
 
         // Check HTTP output
         Request req = new Request.Builder()
@@ -89,8 +82,8 @@ public class AccountControllerTests {
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
-            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
-            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("Melva Rogahn"));
+            assertTrue(rsp.body().string().contains("594.82"));
         } catch(Exception ignored) {}
     }
 
@@ -108,9 +101,9 @@ public class AccountControllerTests {
         JsonArray arr = new JsonArray();
         JsonObject obj = new JsonObject();
 
-        obj.addProperty("uuid", "c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
-        obj.addProperty("name", "Miss Lavina Waelchi");
-        obj.addProperty("balance", 544.91);
+        obj.addProperty("uuid", "04f6ab33-8208-4234-aabd-b6a8be8493da");
+        obj.addProperty("name", "Melva Rogahn");
+        obj.addProperty("balance", 594.82);
         obj.addProperty("roundUpEnabled", false);
 
         arr.add(obj);
@@ -128,9 +121,9 @@ public class AccountControllerTests {
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
 
-            assertTrue(rsp.body().string().contains("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2"));
-            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
-            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("04f6ab33-8208-4234-aabd-b6a8be8493da"));
+            assertTrue(rsp.body().string().contains("Melva Rogahn"));
+            assertTrue(rsp.body().string().contains("594.82"));
             assertTrue(rsp.body().string().contains("No"));
 
         } catch(Exception ignored) {}
@@ -150,9 +143,9 @@ public class AccountControllerTests {
         JsonArray arr = new JsonArray();
         JsonObject obj = new JsonObject();
 
-        obj.addProperty("id", "c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2");
-        obj.addProperty("name", "Miss Lavina Waelchi");
-        obj.addProperty("balance", 544.91);
+        obj.addProperty("id", "04f6ab33-8208-4234-aabd-b6a8be8493da");
+        obj.addProperty("name", "Melva Rogahn");
+        obj.addProperty("balance", 594.82);
         obj.addProperty("roundUpEnabled", false);
 
         arr.add(obj);
@@ -160,20 +153,20 @@ public class AccountControllerTests {
         when(mockManipulator.getApiInformation()).thenReturn(arr);
 
         // Check raw output
-        assertNotNull(control.getAccount("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", false));
+        assertNotNull(control.getAccount("04f6ab33-8208-4234-aabd-b6a8be8493da", false));
 
         // Check HTTP output
 
         // is_admin = false
         Request req = new Request.Builder()
-                .url("http://localhost:" + serverPort + "/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2&is_admin=false")
+                .url("http://localhost:" + serverPort + "/accounts/account?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da&is_admin=false")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
 
-            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
-            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("Melva Rogahn"));
+            assertTrue(rsp.body().string().contains("594.82"));
             assertTrue(rsp.body().string().contains("No"));
             assertTrue(rsp.body().string().contains("YOU ARE A USER"));
 
@@ -181,15 +174,15 @@ public class AccountControllerTests {
 
         // is_admin = true
         req = new Request.Builder()
-                .url("http://localhost:" + serverPort + "/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2&is_admin=true")
+                .url("http://localhost:" + serverPort + "/accounts/account?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da&is_admin=true")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
             assertNotNull(rsp.body());
 
-            assertTrue(rsp.body().string().contains("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2"));
-            assertTrue(rsp.body().string().contains("Miss Lavina Waelchi"));
-            assertTrue(rsp.body().string().contains("544.91"));
+            assertTrue(rsp.body().string().contains("04f6ab33-8208-4234-aabd-b6a8be8493da"));
+            assertTrue(rsp.body().string().contains("Melva Rogahn"));
+            assertTrue(rsp.body().string().contains("594.82"));
             assertTrue(rsp.body().string().contains("No"));
             assertTrue(rsp.body().string().contains("YOU ARE AN ADMIN"));
 
@@ -210,7 +203,7 @@ public class AccountControllerTests {
 
         // missing is_admin param
         req = new Request.Builder()
-                .url("http://localhost:" + serverPort + "/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2")
+                .url("http://localhost:" + serverPort + "/accounts/account?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
@@ -219,6 +212,5 @@ public class AccountControllerTests {
             assertTrue(rsp.body().string().contains("400 - Bad Request"));
             assertTrue(rsp.body().string().contains("No uuid or is_admin parameter provided!"));
         } catch(Exception ignored) {}
-
     }
 }

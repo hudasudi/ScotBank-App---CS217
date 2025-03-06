@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import io.jooby.annotation.Path;
 import io.jooby.annotation.QueryParam;
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.api.AccountAPIManipulator;
+import uk.co.asepstrath.bank.api.manipulators.AccountAPIManipulator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +22,11 @@ import javax.sql.DataSource;
 public class AccountController {
 	private AccountAPIManipulator manip;
 	private final Logger log;
-	private final DataSource ds; // ? Necessary?
+	private final DataSource ds;
 
-	/** This class controls the Jooby formatting & deployment of pages to the site
+	/** This class controls the Jooby formatting & deployment of account pages to the site
 	 * @param log The program log
+	 * @param ds The DataSource to pull from
 	 */
 	public AccountController(Logger log, DataSource ds) {
 		this.log = log;
@@ -42,7 +43,7 @@ public class AccountController {
 	*/
 	@GET("/account-view")
 	public ModelAndView<Map<String, Object>> getAccounts() {
-		Map<String, Object> model = this.manip.createHandleBarsJSONMap();
+		Map<String, Object> model = this.manip.createHandleBarsJSONMap("account", 25);
 
 		return new ModelAndView<>("accounts.hbs", model);
 	}
@@ -54,35 +55,38 @@ public class AccountController {
 	*/
 	@GET("/account")
 	public ModelAndView<Map<String, String>> getAccount(@QueryParam String uuid, @QueryParam Boolean is_admin) {
+		try {
+			if(uuid == null || is_admin == null) {
+				Map<String, String> map = new HashMap<>();
+				map.put("err", "400 - Bad Request");
+				map.put("msg", "No uuid or is_admin parameter provided!");
 
-		if(uuid == null || is_admin == null) {
-			Map<String, String> map = new HashMap<>();
-			map.put("err", "400 - Bad Request");
+				return new ModelAndView<>("error.hbs", map);
+			}
 
-			map.put("msg", "No uuid or is_admin parameter provided!");
+			JsonArray arr = this.manip.getApiInformation();
 
-			return new ModelAndView<>("error.hbs", map);
-		}
+			for(int i = 0; i < arr.size(); i++) {
+				JsonObject obj = arr.get(i).getAsJsonObject();
 
-		JsonArray arr = this.manip.getApiInformation();
-
-		for(int i = 0; i < arr.size(); i++) {
-			JsonObject obj = arr.get(i).getAsJsonObject();
-
-			if(obj.get("id").toString().equals("\""+uuid+"\"")) {
-				if(is_admin) {
-					return new ModelAndView<>("account_admin.hbs", this.manip.createJsonMap(obj));
-				} else {
-					return new ModelAndView<>("account.hbs", this.manip.createJsonMap(obj));
+				if(obj.get("id").toString().equals("\""+uuid+"\"")) {
+					if(is_admin) {
+						return new ModelAndView<>("account_admin.hbs", this.manip.createJsonMap(obj));
+					} else {
+						return new ModelAndView<>("account.hbs", this.manip.createJsonMap(obj));
+					}
 				}
 			}
 		}
 
-		log.error("Unable to find an account with that uuid");
+		catch(Exception e) {
+			log.error("Error whilst building handlebars template", e);
+		}
+
 		return null;
 	}
 
-	/** Get an array of Account from the JSON information in the API file & return their information in String form
+	/** Get an array of Account from the JSON information in the Database & return their information in String form
 	 * @return The JSON information as a String
 	 * @deprecated Use getAccounts instead
 	*/
