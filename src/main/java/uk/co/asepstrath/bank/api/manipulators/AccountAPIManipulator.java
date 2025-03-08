@@ -7,12 +7,9 @@ import uk.co.asepstrath.bank.Account;
 
 import javax.sql.DataSource;
 
-import java.sql.ResultSet;
+import java.sql.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import java.util.Map;
+import java.util.*;
 
 public class AccountAPIManipulator extends APIManipulator {
 

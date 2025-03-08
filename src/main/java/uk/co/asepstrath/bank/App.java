@@ -14,6 +14,7 @@ import uk.co.asepstrath.bank.api.parsers.TransactionAPIParser;
 import uk.co.asepstrath.bank.view.AccountController_;
 import uk.co.asepstrath.bank.view.BusinessController_;
 import uk.co.asepstrath.bank.view.TransactionController_;
+import uk.co.asepstrath.bank.view.AdminController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -47,6 +48,7 @@ public class App extends Jooby {
         mvc(new AccountController_(log, ds));
         mvc(new BusinessController_(log, ds));
         mvc(new TransactionController_(log, ds));
+        mvc(new AdminController_(log, ds));
 
         /*
         Finally we register our application lifecycle methods

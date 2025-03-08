@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Accounts View</title>
+
+        <link rel='stylesheet' href='../assets/static/css/admin_dashboard.css'>
+    </head>
+    <body>
+        <h1 class='header'>Account List View</h1>
+
+        <nav class="navbar">
+            <a class="active" href="#home">Home</a>
+            <a href="#account-details">Account Details</a>
+            <a href="#transactions">Transactions</a>
+            <a href="#card-details">Card Details</a>
+        </nav>
+
+        <main class="accounts">
+            <div class='header'>
+                <h2>Bank Summary</h2>
+            </div>
+
+            <div class='summary-info'>
+                <p>Total Holdings: £<b>{{holdings}}</b></p>
+                <p>Total Accounts: <b>{{users}}</b></p>
+            </div>
+
+            <div class='divider'></div>
+
+            <h2 class='account-header'>Accounts</h2>
+
+            <div class='search'>
+                <input type="text" id="search-bar" onkeyup="searchTable()" placeholder="Search accounts">
+            </div>
+
+            <div class='table'>
+                <table id='accounts-table'>
+                    <thead>
+                        <tr>
+                            <th>Account UUID</th>
+                            <th>Account Holder</th>
+                            <th>Balance</th>
+                            <th>Round Up</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id='table-body'></tbody>
+                </table>
+            </div>
+
+            <div class='pagination'></div>
+        </main>
+
+        <script>
+            // Search bar
+            function searchTable() {
+                let input, filter, table, tr, td, i, txt_value;
+
+                input = document.getElementById("search-bar");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("accounts-table");
+                tr = table.getElementsByTagName("tr");
+
+                // Loop through rows, hide those that don't match query
+                for(i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[1];
+
+                    if(td) {
+                        txt_value = td.textContent || td.innerText;
+
+                        if(txt_value.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        }
+
+                        else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+
+            // Paginated Table
+            const data = [
+                {{#each accounts}}
+                    {
+                        "uuid": "{{uuid}}",
+                        "name": "{{name}}",
+                        "balance": "{{bal}}",
+                        "round_up": "{{round}}"
+                    }{{#unless @last}},{{/unless}}
+                {{/each}}
+            ];
+
+            const rows_per_page = 25;
+            let current_page = 1;
+
+            function displayTable(page) {
+                const table_body = document.getElementById("table-body");
+                const start = (page - 1) * rows_per_page;
+                const end = start + rows_per_page;
+                const sliced_data = data.slice(start, end);
+
+                table_body.innerHTML = ``;
+
+                sliced_data.forEach(item => {
+                    const row = table_body.insertRow();
+                    const uuid = row.insertCell(0);
+                    const name = row.insertCell(1);
+                    const balance = row.insertCell(2);
+                    const round_up = row.insertCell(3);
+                    const action = row.insertCell(4);
+
+                    uuid.innerHTML = item.uuid;
+                    name.innerHTML = item.name;
+                    balance.innerHTML = "£" + item.balance;
+                    round_up.innerHTML = item.round_up;
+                    action.innerHTML = `<button class="view-btn" onclick="location.href='/account?uuid=`+item.uuid+`'">View</button>`;
+                });
+
+                updatePagination(page);
+            }
+
+            function updatePagination(current_page) {
+                const page_count = Math.ceil(data.length / rows_per_page);
+                const pagination_container = document.querySelector(".pagination");
+
+                pagination_container.innerHTML = "";
+
+                for(let i = 1; i <= page_count; i++) {
+                    const page_link = document.createElement("a");
+                    page_link.href = '#';
+                    page_link.innerText = i;
+                    page_link.onclick = function() {
+                        displayTable(i);
+                    };
+
+                    if(i === current_page) {
+                        page_link.style.fontWeight = "bold";
+                        page_link.classList.add("active");
+                    }
+
+                    pagination_container.appendChild(page_link);
+                    pagination_container.appendChild(document.createTextNode(" "));
+                }
+            }
+
+            // Initial display
+            displayTable(current_page);
+        </script>
+    </body>
+</html>

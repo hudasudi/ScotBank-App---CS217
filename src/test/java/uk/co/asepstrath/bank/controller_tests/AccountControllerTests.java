@@ -87,48 +87,6 @@ public class AccountControllerTests {
         } catch(Exception ignored) {}
     }
 
-    // THIS TEST DOESNT WORK PER SE
-    @Test
-    public void checkGetAccounts(int serverPort) {
-        // Somehow the code inside here is reaching through time & space to take db info that's not there & output it (that's why the test passes)
-
-        // Mock Manipulator & Insert into Controller
-        AccountAPIManipulator mockManipulator = mock(AccountAPIManipulator.class);
-        AccountController control = new AccountController(mock(Logger.class), null);
-        control.setAccountAPIManipulator(mockManipulator);
-
-        // Fake data to test
-        JsonArray arr = new JsonArray();
-        JsonObject obj = new JsonObject();
-
-        obj.addProperty("uuid", "04f6ab33-8208-4234-aabd-b6a8be8493da");
-        obj.addProperty("name", "Melva Rogahn");
-        obj.addProperty("balance", 594.82);
-        obj.addProperty("roundUpEnabled", false);
-
-        arr.add(obj);
-
-        when(mockManipulator.getApiInformation()).thenReturn(arr);
-
-        // Check raw output
-        assertNotNull(control.getAccounts());
-
-        // Check HTTP output
-        Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/account-view")
-                .build();
-
-        try(Response rsp = client.newCall(req).execute()) {
-            assertNotNull(rsp.body());
-
-            assertTrue(rsp.body().string().contains("04f6ab33-8208-4234-aabd-b6a8be8493da"));
-            assertTrue(rsp.body().string().contains("Melva Rogahn"));
-            assertTrue(rsp.body().string().contains("594.82"));
-            assertTrue(rsp.body().string().contains("No"));
-
-        } catch(Exception ignored) {}
-    }
-
 	// THIS TEST DOESNT WORK PER SE
     @Test
     public void checkGetAccount(int serverPort) {

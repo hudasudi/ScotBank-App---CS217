@@ -36,16 +36,6 @@ public class AccountController {
 		this.manip = manip;
 	}
 
-	/** Get & populate the handlebars template with information from the API
-	 * @return The model to build & deploy
-	*/
-	@GET("/account-view")
-	public ModelAndView<Map<String, Object>> getAccounts() {
-		Map<String, Object> model = this.manip.createHandleBarsJSONMap("account", 25);
-
-		return new ModelAndView<>("accounts.hbs", model);
-	}
-
 	/** Get & populate the handlebars template with information for a single account from the API
 	 * @param uuid The Account's UUID
 	 * @param is_admin Whether the Account is an admin account or not
@@ -86,7 +76,7 @@ public class AccountController {
 
 	/** Get an array of Account from the JSON information in the Database & return their information in String form
 	 * @return The JSON information as a String
-	 * @deprecated Use getAccounts instead
+	 * @deprecated
 	*/
 	@Deprecated
 	@GET("/account-objects")
