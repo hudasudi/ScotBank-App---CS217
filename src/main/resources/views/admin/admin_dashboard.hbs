@@ -3,55 +3,53 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Accounts View</title>
+        <title>Dashboard</title>
 
-        <link rel='stylesheet' href='../assets/static/css/admin_dashboard.css'>
+        <link rel="stylesheet" href="../assets/static/css/admin/admin_dashboard.css">
     </head>
     <body>
-        <h1 class='header'>Account List View</h1>
+        <h1 class="header">Account List View</h1>
 
         <nav class="navbar">
-            <a class="active" href="#home">Home</a>
-            <a href="#account-details">Account Details</a>
-            <a href="#transactions">Transactions</a>
-            <a href="#card-details">Card Details</a>
+            <a class="active" href="/admin/dashboard">Home</a>
+            <a href="/admin/business-report">Business Report</a>
+            <a href="/admin/big-spenders">Big Spenders</a>
         </nav>
 
         <main class="accounts">
-            <div class='header'>
+            <div class="header">
                 <h2>Bank Summary</h2>
             </div>
 
-            <div class='summary-info'>
+            <div class="summary-info">
                 <p>Total Holdings: £<b>{{holdings}}</b></p>
                 <p>Total Accounts: <b>{{users}}</b></p>
             </div>
 
-            <div class='divider'></div>
+            <div class="divider"></div>
 
-            <h2 class='account-header'>Accounts</h2>
+            <h2 class="account-header">Accounts</h2>
 
-            <div class='search'>
+            <div class="search">
                 <input type="text" id="search-bar" onkeyup="searchTable()" placeholder="Search accounts">
             </div>
 
-            <div class='table'>
-                <table id='accounts-table'>
+            <div class="table">
+                <table id="accounts-table">
                     <thead>
                         <tr>
                             <th>Account UUID</th>
                             <th>Account Holder</th>
                             <th>Balance</th>
-                            <th>Round Up</th>
                             <th>Action</th>
                         </tr>
                     </thead>
 
-                    <tbody id='table-body'></tbody>
+                    <tbody id="table-body"></tbody>
                 </table>
             </div>
 
-            <div class='pagination'></div>
+            <div class="pagination"></div>
         </main>
 
         <script>
@@ -89,7 +87,6 @@
                         "uuid": "{{uuid}}",
                         "name": "{{name}}",
                         "balance": "{{bal}}",
-                        "round_up": "{{round}}"
                     }{{#unless @last}},{{/unless}}
                 {{/each}}
             ];
@@ -110,14 +107,12 @@
                     const uuid = row.insertCell(0);
                     const name = row.insertCell(1);
                     const balance = row.insertCell(2);
-                    const round_up = row.insertCell(3);
-                    const action = row.insertCell(4);
+                    const action = row.insertCell(3);
 
                     uuid.innerHTML = item.uuid;
                     name.innerHTML = item.name;
                     balance.innerHTML = "£" + item.balance;
-                    round_up.innerHTML = item.round_up;
-                    action.innerHTML = `<button class="view-btn" onclick="location.href='/account?uuid=`+item.uuid+`'">View</button>`;
+                    action.innerHTML = `<button class="view-btn" onclick="location.href='/admin/account?uuid=`+item.uuid+`'">View</button>`;
                 });
 
                 updatePagination(page);

@@ -49,7 +49,6 @@ public abstract class APIManipulator {
 			log.error("An error occurred whilst trying to execute a query to the database", e);
 			return null;
 		}
-
 	}
 
 	/** Format a database result into a JsonArray

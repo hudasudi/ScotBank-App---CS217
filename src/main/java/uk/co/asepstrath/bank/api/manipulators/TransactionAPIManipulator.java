@@ -8,8 +8,11 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +67,42 @@ public class TransactionAPIManipulator extends APIManipulator {
 		map.put("type", object.get("type").getAsString());
 
 		return map;
+	}
+
+	public JsonArray getTransactionForAccount(String uuid) {
+		try(Connection conn = this.ds.getConnection()) {
+			JsonArray transactions = new JsonArray();
+
+			String query = "SELECT t.Timestamp, t.Amount, t.TransactionID, " +
+					"COALESCE(a.Name, b.Name, t.Sender) AS Sender, " +
+					"COALESCE(c.Name, d.Name, t.Recipient) AS Recipient, " +
+					"t.Type " +
+					"FROM Transactions t " +
+					"LEFT JOIN Accounts a ON t.Sender = a.UUID " +
+					"LEFT JOIN Businesses b ON t.Sender = b.ID " +
+					"LEFT JOIN Accounts c ON t.Recipient = c.UUID " +
+					"LEFT JOIN Businesses d ON t.Recipient = d.ID " +
+					"WHERE t.Sender = ? OR t.Recipient = ? " +
+					"ORDER BY t.Timestamp ASC";
+
+				PreparedStatement stmt = conn.prepareStatement(query);
+
+				stmt.setString(1, uuid);
+				stmt.setString(2, uuid);
+
+				ResultSet set = stmt.executeQuery();
+
+				while(set.next()) {
+					transactions.add(this.makeJsonObject(set));
+				}
+
+			return transactions;
+		}
+
+		catch(SQLException e) {
+			log.error("An error occurred whilst querying the database", e);
+			return null;
+		}
 	}
 
 	/**

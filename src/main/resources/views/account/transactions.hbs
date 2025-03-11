@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Transactions</title>
+        <link rel="stylesheet" href="../assets/static/css/account/transactions.css">
+    </head>
+    <body>
+        <div class="header">
+            <h1 class="header">Transactions</h1>
+        </div>
+
+        <nav class="navbar">
+            <a href="/accounts/dashboard?uuid={{account.uuid}}">Home</a>
+            <a href="/accounts/details?uuid={{account.uuid}}">Account Details</a>
+            <a class="active" href="/accounts/transactions?uuid={{account.uuid}}">Transaction Details</a>
+            <a href="/accounts/summary?uuid={{account.uuid}}">Account Summary</a>
+        </nav>
+
+        <section class="trans-overview">
+            <h2>Transactions Overview</h2>
+
+            <p><b>In: </b>£{{income}}</p>
+            <p><b>Out: </b>£{{outgoings}}</p>
+            <br><br>
+
+            <p class="trans-overview-total"><b>Total: </b>£{{balance}}</p>
+        </section>
+
+        <section class="table-container">
+            <div class="transactions">
+                <h2>Transactions</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>To/From</th>
+                            <th>Amount (£)</th>
+                            <th>Balance (£)</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-body"></tbody>
+                </table>
+
+                <p id="load-more-button" onclick="showMoreRows()">Load More</p>
+            </div>
+        </section>
+
+        <script>
+            const transactions = [
+                {{#each transactions}}
+                    [
+                        "{{this.timestamp}}",
+                        "{{this.to-from}}",
+                        "{{this.amount}}",
+                        "{{this.current_balance}}"
+                    ]{{#unless @last}},{{/unless}}
+                {{/each}}
+            ];
+
+            let currentIndex = 0; // Tracks how many rows are displayed
+            const rowsPerPage = 25;
+            const tableBody = document.getElementById("table-body");
+            const loadMoreBtn = document.getElementById("load-more-button");
+
+            function showMoreRows() {
+                const nextIndex = Math.min(currentIndex + rowsPerPage, transactions.length);
+
+                for (let i = currentIndex; i < nextIndex; i++) {
+                    let row = document.createElement("tr");
+                    row.innerHTML = `
+                <td>${transactions[i][0]}</td>
+                <td>${transactions[i][1]}</td>
+                <td>${transactions[i][2]}</td>
+                <td>${transactions[i][3]}</td>
+                <td><button class="view-btn">See Details</button></td>
+            `;
+                    tableBody.appendChild(row);
+                }
+
+                currentIndex = nextIndex;
+
+                // Hide button when all rows are displayed
+                if (currentIndex >= transactions.length) {
+                    loadMoreBtn.style.display = "none";
+                }
+            }
+
+            // Event delegation: Handle all "View" button clicks
+            // This is temporary, should get changed so you can move to another page to view the individual transaction
+            tableBody.addEventListener("click", function (event) {
+                if (event.target.classList.contains("view-btn")) {
+                    const row = event.target.closest("tr");
+                    const date = row.children[0].textContent;
+                    const description = row.children[1].textContent;
+                    const amount = row.children[2].textContent;
+                    const balance = row.children[3].textContent;
+
+                    alert(`Transaction Details:\n\nDate: ${date}\nTo/From: ${description}\nAmount: ${amount}\nBalance: ${balance}`);
+                }
+            });
+
+            // Load initial rows
+            showMoreRows();
+        </script>
+    </body>
+</html>
