@@ -7,42 +7,22 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.QueryParam;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.api.manipulators.TransactionAPIManipulator;
 
 import io.jooby.annotation.Path;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 @Path("/transactions")
-public class TransactionController {
-	private TransactionAPIManipulator manip;
-	private final Logger log;
-	private final DataSource ds;
+public class TransactionController extends Controller {
 
 	/** This class controls the Jooby formatting & deployment of transaction pages to the site
 	 * @param log The program log
 	 * @param ds The DataSource to pull from
 	*/
 	public TransactionController(Logger log, DataSource ds) {
-		this.log = log;
-		this.ds = ds;
-		this.manip = new TransactionAPIManipulator(log, ds);
-	}
-
-	public void setTransactionAPIManipulator(TransactionAPIManipulator manip) {
-		this.manip = manip;
-	}
-
-	private ModelAndView<Map<String, String>> buildErrorPage(String error, String msg) {
-		Map<String, String> map = new HashMap<>();
-
-		map.put("err", error);
-		map.put("msg", msg);
-
-		return new ModelAndView<>("error.hbs", map);
+		super(log, ds);
 	}
 
 	/** Get & populate the handlebars template with information from the API
@@ -50,7 +30,7 @@ public class TransactionController {
 	*/
 	@GET("/transaction-view")
 	public ModelAndView<Map<String, Object>> getTransactions() {
-		Map<String, Object> model = this.manip.createHandleBarsJSONMap("transaction", 1000);
+		Map<String, Object> model = this.transaction_manipulator.createHandleBarsJSONMap("transaction", 1000);
 
 		return new ModelAndView<>("transactions.hbs", model);
 	}
@@ -60,19 +40,19 @@ public class TransactionController {
 	 * @return The model to build & deploy
 	 */
 	@GET("/transaction")
-	public ModelAndView<Map<String, String>> getTransaction(@QueryParam String uuid) {
+	public ModelAndView<Map<String, Object>> getTransaction(@QueryParam String uuid) {
 		try {
 			if(uuid == null) {
 				return this.buildErrorPage("400 - Bad Request", "No uuid parameter provided!");
 			}
 
-			JsonArray arr = this.manip.getApiInformation();
+			JsonArray arr = this.transaction_manipulator.getApiInformation();
 
 			for(int i =0; i < arr.size(); i++) {
 				JsonObject obj = arr.get(i).getAsJsonObject();
 
 				if(obj.get("id").getAsString().equals(uuid)) {
-					return new ModelAndView<>("transaction.hbs", this.manip.createJsonMap(obj));
+					return new ModelAndView<>("transaction.hbs", this.transaction_manipulator.createJsonMap(obj));
 				}
 			}
 
@@ -93,7 +73,7 @@ public class TransactionController {
 	@Deprecated
 	@GET("/transaction-objects")
 	public String transactionObjects() {
-		ArrayList<Transaction> arr = this.manip.jsonToTransactions();
+		ArrayList<Transaction> arr = this.transaction_manipulator.jsonToTransactions();
 
 		StringBuilder out = new StringBuilder();
 
@@ -112,7 +92,7 @@ public class TransactionController {
 	@Deprecated
 	@GET("/transaction-object")
 	public String transactionObject(@QueryParam int pos) {
-		ArrayList<Transaction> arr = this.manip.jsonToTransactions();
+		ArrayList<Transaction> arr = this.transaction_manipulator.jsonToTransactions();
 
 		if(pos < 0 || pos > arr.size()-1) {
 			return "Error 400 - Bad Request\nThe index you requested is out of bounds";

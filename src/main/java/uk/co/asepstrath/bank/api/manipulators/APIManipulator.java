@@ -154,7 +154,7 @@ public abstract class APIManipulator {
 	public Map<String, Object> createHandleBarsJSONMap(String model_name, int col_size) {
 		JsonArray json = this.getApiInformation();
 
-		List<Map<String, String>> object_list = new ArrayList<>();
+		List<Map<String, Object>> object_list = new ArrayList<>();
 
 		for(int i = 0; i < json.size(); i++) {
 			JsonObject obj = json.get(i).getAsJsonObject();
@@ -162,7 +162,7 @@ public abstract class APIManipulator {
 			object_list.add(this.createJsonMap(obj));
 		}
 
-		List<List<Map<String, String>>> chunked_objects = this.chunkList(object_list, col_size);
+		List<List<Map<String, Object>>> chunked_objects = this.chunkList(object_list, col_size);
 
 		Map<String, Object> model = new HashMap<>();
 		model.put(model_name+"_chunks", chunked_objects);
@@ -170,19 +170,21 @@ public abstract class APIManipulator {
 		return model;
 	}
 
-	/** Take a JsonObject & Convert it into a Map of Key-Value Pairs
+	/**
+	 * Take a JsonObject & Convert it into a Map of Key-Value Pairs
+	 *
 	 * @param object The JsonObject to convert
 	 * @return A map of all the JsonObject's Key-Value Pairs
-	*/
-	protected abstract Map<String, String> createJsonMap(JsonObject object);
+	 */
+	protected abstract Map<String, Object> createJsonMap(JsonObject object);
 
 	/** Takes a list of all accounts, chunks them into sections of chunk_size then returns a new list in chunks of chunk_size
 	 * @param list_to_chunk The list to chunk into sections
 	 * @param chunk_size The number of elements per chunk in the list
 	 * @return The newly chunked list
 	*/
-	private List<List<Map<String, String>>> chunkList(List<Map<String, String>> list_to_chunk, int chunk_size) {
-		List<List<Map<String, String>>> chunks = new ArrayList<>();
+	private List<List<Map<String, Object>>> chunkList(List<Map<String, Object>> list_to_chunk, int chunk_size) {
+		List<List<Map<String, Object>>> chunks = new ArrayList<>();
 
 		for(int i = 0; i < list_to_chunk.size(); i += chunk_size) {
 			chunks.add(list_to_chunk.subList(i, Math.min(i + chunk_size, list_to_chunk.size())));

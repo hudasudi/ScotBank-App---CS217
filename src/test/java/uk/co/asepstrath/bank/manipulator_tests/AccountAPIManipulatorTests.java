@@ -84,7 +84,7 @@ public class AccountAPIManipulatorTests {
 		obj.addProperty("startingBalance", BigDecimal.valueOf(0.00));
 		obj.addProperty("roundUpEnabled", false);
 
-		Map<String, String> map = manipulator.createJsonMap(obj);
+		Map<String, Object> map = manipulator.createJsonMap(obj);
 
 		assertNotNull(map);
 		assertEquals("ID", map.get("uuid"));

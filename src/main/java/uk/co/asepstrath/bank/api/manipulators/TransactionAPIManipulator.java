@@ -50,14 +50,14 @@ public class TransactionAPIManipulator extends APIManipulator {
 	}
 
 	/**
-	 * Take a JsonObject & Convert it into a Map of Key-Value Pairs
-	 *
-	 * @param object The JsonObject to convert
-	 * @return A map of all the JsonObject's Key-Value Pairs
-	 */
+     * Take a JsonObject & Convert it into a Map of Key-Value Pairs
+     *
+     * @param object The JsonObject to convert
+     * @return A map of all the JsonObject's Key-Value Pairs
+     */
 	@Override
-	public Map<String, String> createJsonMap(JsonObject object) {
-		Map<String, String> map = new HashMap<>();
+	public Map<String, Object> createJsonMap(JsonObject object) {
+		Map<String, Object> map = new HashMap<>();
 
 		map.put("timestamp", object.get("timestamp").getAsString());
 		map.put("amount", object.get("amount").getAsString());

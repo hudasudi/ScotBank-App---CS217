@@ -81,7 +81,7 @@ public class BusinessAPIManipulatorTests {
 		obj.addProperty("category", "CATEGORY");
 		obj.addProperty("sanctioned", false);
 
-		Map<String, String> map = manipulator.createJsonMap(obj);
+		Map<String, Object> map = manipulator.createJsonMap(obj);
 
 		assertNotNull(map);
 		assertEquals("ID", map.get("id"));

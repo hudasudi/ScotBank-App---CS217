@@ -41,14 +41,16 @@ public class AccountAPIManipulator extends APIManipulator {
 		return "SELECT * FROM Accounts";
 	}
 
-	/** Take a JsonObject & Convert it into a Map of Key-Value Pairs
-	 * @param object The JsonObject to convert
-	 * @return A map of all the JsonObject's Key-Value Pairs
-	*/
+	/**
+     * Take a JsonObject & Convert it into a Map of Key-Value Pairs
+     *
+     * @param object The JsonObject to convert
+     * @return A map of all the JsonObject's Key-Value Pairs
+     */
 	@Override
-	public Map<String, String> createJsonMap(JsonObject object) {
+	public Map<String, Object> createJsonMap(JsonObject object) {
 		// The account map for the JsonObject
-		Map<String, String> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 
 		// Put the JSON information into the account map
 		map.put("uuid", object.get("id").getAsString());

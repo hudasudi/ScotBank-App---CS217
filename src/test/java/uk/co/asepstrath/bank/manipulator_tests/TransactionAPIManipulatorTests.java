@@ -88,7 +88,7 @@ public class TransactionAPIManipulatorTests {
 		obj.addProperty("recipient", "RECIPIENT");
 		obj.addProperty("type", "TYPE");
 
-		Map<String, String> map = manip.createJsonMap(obj);
+		Map<String, Object> map = manip.createJsonMap(obj);
 
 		assertNotNull(map);
 		assertEquals("TIMESTAMP", map.get("timestamp"));

@@ -10,49 +10,23 @@ import io.jooby.annotation.QueryParam;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.api.manipulators.AccountAPIManipulator;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.api.manipulators.BusinessAPIManipulator;
-import uk.co.asepstrath.bank.api.manipulators.TransactionAPIManipulator;
 
 import javax.sql.DataSource;
 
 @Path("/accounts")
-public class AccountController {
-	private AccountAPIManipulator account_manipulator;
-	private BusinessAPIManipulator business_manipulator;
-	private TransactionAPIManipulator transaction_manipulator;
-	private final Logger log;
-	private final DataSource ds;
+public class AccountController extends Controller {
 
 	/** This class controls the Jooby formatting & deployment of account pages to the site
 	 * @param log The program log
 	 * @param ds The DataSource to pull from
 	 */
 	public AccountController(Logger log, DataSource ds) {
-		this.log = log;
-		this.account_manipulator = new AccountAPIManipulator(log, ds);
-		this.business_manipulator = new BusinessAPIManipulator(log, ds);
-		this.transaction_manipulator = new TransactionAPIManipulator(log, ds);
-		this.ds = ds;
-	}
-
-	// FOR TESTING
-	public void setAccountAPIManipulator(AccountAPIManipulator manip) {
-		this.account_manipulator = manip;
-	}
-
-	private ModelAndView<Map<String, Object>> buildErrorPage(String error, String msg) {
-		Map<String, Object> map = new HashMap<>();
-
-		map.put("error", error);
-		map.put("msg", msg);
-
-		return new ModelAndView<>("error.hbs", map);
+		super(log, ds);
 	}
 
 	/** Get & populate the handlebars template with information for a single account from the API
@@ -89,8 +63,8 @@ public class AccountController {
 			// Calculate actual balance
 			BigDecimal account_balance = account.get("startingBalance").getAsBigDecimal();
 
-			List<Map<String, String>> in_transactions = new ArrayList<>();
-			List<Map<String, String>> out_transactions = new ArrayList<>();
+			List<Map<String, Object>> in_transactions = new ArrayList<>();
+			List<Map<String, Object>> out_transactions = new ArrayList<>();
 
 			int in_count = 0; // If count = 5, we stop putting transaction data into list
 			int out_count = 0;
@@ -98,7 +72,7 @@ public class AccountController {
 			for(int i = 0; i < transactions.size(); i++) {
 				JsonObject transaction = transactions.get(i).getAsJsonObject();
 
-				Map<String, String> transaction_map = this.transaction_manipulator.createJsonMap(transaction);
+				Map<String, Object> transaction_map = this.transaction_manipulator.createJsonMap(transaction);
 
 				if(transaction.get("type").getAsString().equals("PAYMENT") || transaction.get("type").getAsString().equals("WITHDRAWAL")) {
 					if(account_balance.compareTo(transaction.get("amount").getAsBigDecimal()) >= 0 || transaction.get("type").getAsString().equals("PAYMENT")) {

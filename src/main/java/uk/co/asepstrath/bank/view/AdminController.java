@@ -10,40 +10,22 @@ import io.jooby.annotation.Path;
 import io.jooby.annotation.QueryParam;
 import org.slf4j.Logger;
 
-import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.api.manipulators.AccountAPIManipulator;
-import uk.co.asepstrath.bank.api.manipulators.BusinessAPIManipulator;
-import uk.co.asepstrath.bank.api.manipulators.TransactionAPIManipulator;
-
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Path("/admin")
-public class AdminController {
-	private final Logger log;
-	private final DataSource ds;
-	private final AccountAPIManipulator account_manipulator;
-	private final BusinessAPIManipulator business_manipulator;
-	private final TransactionAPIManipulator	transaction_manipulator;
+public class AdminController extends Controller {
 
 	/** This class controls the Jooby formatting & deployment of admin pages to the site
 	 * @param log The program log
 	 * @param ds The DataSource to pull from
 	*/
 	public AdminController(Logger log, DataSource ds) {
-		this.log = log;
-		this.ds = ds;
-
-		this.account_manipulator = new AccountAPIManipulator(log, ds);
-		this.business_manipulator = new BusinessAPIManipulator(log, ds);
-		this.transaction_manipulator = new TransactionAPIManipulator(log, ds);
+		super(log, ds);
 	}
 
 	/** Get & populate the handlebars template with information from the API
@@ -52,7 +34,7 @@ public class AdminController {
 	@GET("/dashboard")
 	public ModelAndView<Map<String, Object>> getDashboard() {
 		JsonArray accounts = this.account_manipulator.getApiInformation();
-		List<Map<String, String>> account_list = new ArrayList<>();
+		List<Map<String, Object>> account_list = new ArrayList<>();
 
 		int account_count = 0;
 		BigDecimal bank_value = BigDecimal.ZERO;
@@ -60,7 +42,7 @@ public class AdminController {
 		for(int i = 0; i < accounts.size(); i++) {
 			JsonObject account = accounts.get(i).getAsJsonObject();
 
-			Map<String, String> account_map = this.account_manipulator.createJsonMap(account);
+			Map<String, Object> account_map = this.account_manipulator.createJsonMap(account);
 			bank_value = bank_value.add(BigDecimal.valueOf(account.get("startingBalance").getAsDouble()));
 
 			account_list.add(account_map);
@@ -73,15 +55,6 @@ public class AdminController {
 		model.put("users", account_count);
 
 		return new ModelAndView<>("admin/admin_dashboard.hbs", model);
-	}
-
-	private ModelAndView<Map<String, Object>> buildErrorPage(String error, String msg) {
-		Map<String, Object> map = new HashMap<>();
-
-		map.put("error", error);
-		map.put("msg", msg);
-
-		return new ModelAndView<>("error.hbs", map);
 	}
 
 	@GET("/account")
@@ -114,13 +87,13 @@ public class AdminController {
 			// Calculate actual balance
 			BigDecimal account_balance = account.get("startingBalance").getAsBigDecimal();
 
-			List<Map<String, String>> in_transactions = new ArrayList<>();
-			List<Map<String, String>> out_transactions = new ArrayList<>();
+			List<Map<String, Object>> in_transactions = new ArrayList<>();
+			List<Map<String, Object>> out_transactions = new ArrayList<>();
 
 			for(int i = 0; i < transactions.size(); i++) {
 				JsonObject transaction = transactions.get(i).getAsJsonObject();
 
-				Map<String, String> transaction_map = this.transaction_manipulator.createJsonMap(transaction);
+				Map<String, Object> transaction_map = this.transaction_manipulator.createJsonMap(transaction);
 
 				if(transaction.get("type").getAsString().equals("PAYMENT") || transaction.get("type").getAsString().equals("WITHDRAWAL")) {
 					if(account_balance.compareTo(transaction.get("amount").getAsBigDecimal()) >= 0 || transaction.get("type").getAsString().equals("PAYMENT")) {
