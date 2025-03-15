@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class Account {
-
     private final String id;
     private final String name;
     private BigDecimal balance;
@@ -38,14 +37,20 @@ public class Account {
     /** Withdraw an amount from the Account
      * @param amount The amount to withdraw
      * @throws ArithmeticException Thrown during exceptional arithmetic conditions
-     */
-    public void withdraw(BigDecimal amount) throws ArithmeticException {
-        if(this.balance.subtract(amount).compareTo(BigDecimal.valueOf(0)) >= 0) {
+    */
+    public void withdraw(BigDecimal amount, boolean is_overdraft) throws ArithmeticException {
+        if(is_overdraft) {
             this.balance = this.balance.subtract(amount);
         }
 
         else {
-            throw new ArithmeticException();
+            if(this.balance.subtract(amount).compareTo(BigDecimal.valueOf(0)) >= 0) {
+                this.balance = this.balance.subtract(amount);
+            }
+
+            else {
+                throw new ArithmeticException();
+            }
         }
     }
 
@@ -53,7 +58,6 @@ public class Account {
      * @return The accounts balance
     */
     public BigDecimal getBalance() {
-
         this.balance = this.balance.setScale(2, RoundingMode.HALF_DOWN);
 
         return this.balance;
@@ -65,6 +69,8 @@ public class Account {
     public String getName() { return this.name; }
 
     public String getID() { return this.id; }
+
+    public boolean isRoundUpEnabled() { return this.roundUpEnabled; }
 
     /** Stringify an Account's information
      * @return A String holding Account information

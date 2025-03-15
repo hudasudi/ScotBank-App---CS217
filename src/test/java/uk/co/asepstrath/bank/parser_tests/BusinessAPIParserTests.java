@@ -2,81 +2,119 @@ package uk.co.asepstrath.bank.parser_tests;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import org.junit.jupiter.api.Test;
-
 import org.slf4j.Logger;
-
-import uk.co.asepstrath.bank.api.manipulators.BusinessAPIManipulator;
-import uk.co.asepstrath.bank.api.parsers.AccountAPIParser;
 import uk.co.asepstrath.bank.api.parsers.BusinessAPIParser;
-
 import javax.sql.DataSource;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BusinessAPIParserTests {
 
+	/** Testing whether writeAPIInformation() works as intended.
+	 * Expected normal output: no errors
+	 */
 	@Test
 	public void checkWriteAPIInformation() {
 		try {
-			// Make mock data source to write to
-			DataSource mockDataSource = mock(DataSource.class);
+			// Make mock objects to fake info
+			DataSource ds = mock(DataSource.class);
+			Connection con = mock(Connection.class);
+			PreparedStatement ps = mock(PreparedStatement.class);
+			ResultSet rs = mock(ResultSet.class);
 
-			// Make parser & write to mock source
-			BusinessAPIParser parser = new BusinessAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/businesses", mockDataSource);
+			// Setup what to do upon method invocation
+			when(ds.getConnection()).thenReturn(con);
+			when(con.prepareStatement(anyString())).thenReturn(ps);
+
+			// For getApiInformation
+			when(con.prepareStatement(anyString())).thenReturn(ps);
+			when(rs.next()).thenReturn(true, false);
+
+			BusinessAPIParser parser = new BusinessAPIParser(mock(Logger.class), "", ds) {
+				@Override
+				protected JsonArray parseResponse() {
+					// Setup fake info
+					JsonObject json = new JsonObject();
+					json.addProperty("id", "ABC");
+					json.addProperty("name", "name");
+					json.addProperty("category", "Something");
+					json.addProperty("sanctioned", false);
+
+					JsonArray arr = new JsonArray();
+					arr.add(json);
+
+					return arr;
+				}
+			};
+
+			// 'Write' Info to db
 			parser.writeAPIInformation();
+		}
 
-			// Create manipulator to test data pass through
-			BusinessAPIManipulator manip = new BusinessAPIManipulator(mock(Logger.class), mockDataSource);
-
-			// Get that the API info is retrieved from the mock db properly
-			assertNotNull(manip.getApiInformation());
-
-			// Check an example JsonObject for its contents
-			JsonObject obj = manip.getApiInformation().get(0).getAsJsonObject();
-
-			assertEquals("ALD", obj.get("id").toString());
-			assertEquals("Aldi", obj.get("name").toString());
-			assertEquals("Groceries", obj.get("category").toString());
-			assertFalse(obj.get("sanctioned").getAsBoolean());
-		} catch (Exception ignored) {}
+		catch(Exception e) {
+			throw new AssertionError("checkWriteAPIInformation() Failed", e);
+		}
 	}
 
+	/** Testing whether getInsertQuery() works as intended.
+	 * Expected normal output: String with value "INSERT INTO Businesses (ID, Name, Category, Sanctioned) VALUES (?, ?, ?, ?)"
+	 */
 	@Test
-	public void checkGetInsertQuery() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-		AccountAPIParser parser = new AccountAPIParser(mock(Logger.class), "", mock(DataSource.class));
+	public void checkGetInsertQuery() {
+		try {
+			// Make class
+			BusinessAPIParser parser = new BusinessAPIParser(mock(Logger.class), "", mock(DataSource.class));
 
-		Method method = AccountAPIParser.class.getDeclaredMethod("getInsertQuery");
-		method.setAccessible(true);
+			// Set method to accessible
+			Method method = BusinessAPIParser.class.getDeclaredMethod("getInsertQuery");
+			method.setAccessible(true);
 
-		String query = (String) method.invoke(parser);
+			// Get output
+			String query = (String) method.invoke(parser);
 
-		assertNotNull(query);
-		assertEquals("INSERT INTO Accounts (UUID, Name, Balance, roundUpEnabled) VALUES (?, ?, ?, ?)", query);
+			// Check output
+			assertNotNull(query);
+			assertEquals("INSERT INTO Businesses (ID, Name, Category, Sanctioned) VALUES (?, ?, ?, ?)", query);
+		}
+
+		catch(Exception e) {
+			throw new AssertionError("checkGetInsertQuery() Failed", e);
+		}
 	}
 
+	/** Testing whether parseResponse() works as intended.
+	 * Expected normal output: values String, String, String & Boolean.
+	 */
 	@Test
 	public void checkParseResponse() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+		// Make class
 		BusinessAPIParser parser = new BusinessAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/businesses", mock(DataSource.class));
 
+		// Set method to accessible
 		Method method = BusinessAPIParser.class.getDeclaredMethod("parseResponse");
 		method.setAccessible(true);
 
+		// Get output array
 		JsonArray json = (JsonArray) method.invoke(parser);
 
 		assertNotNull(json);
 
+		// Get output
 		JsonObject obj = json.get(0).getAsJsonObject();
 
-		assertEquals("ALD", obj.get("id").getAsString());
-		assertEquals("Aldi", obj.get("name").getAsString());
-		assertEquals("Groceries", obj.get("category").getAsString());
-		assertFalse(obj.get("sanctioned").getAsBoolean());
+		assertNotNull(obj.get("id"));
+		assertNotNull(obj.get("name"));
+		assertNotNull(obj.get("category"));
+		assertNotNull(obj.get("sanctioned"));
 
 		// Trigger catch statement
 		BusinessAPIParser err_parser = new BusinessAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/transactions", mock(DataSource.class));

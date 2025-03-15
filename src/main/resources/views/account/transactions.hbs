@@ -25,7 +25,7 @@
             <p><b>Out: </b>£{{outgoings}}</p>
             <br><br>
 
-            <p class="trans-overview-total"><b>Total: </b>£{{balance}}</p>
+            <p class="trans-overview-total"><b>Total: </b>£{{account.bal}}</p>
         </section>
 
         <section class="table-container">
@@ -39,6 +39,7 @@
                             <th>To/From</th>
                             <th>Amount (£)</th>
                             <th>Balance (£)</th>
+                            <th>Processed</th>
                             <th>View</th>
                         </tr>
                     </thead>
@@ -57,26 +58,29 @@
                         "{{this.timestamp}}",
                         "{{this.to-from}}",
                         "{{this.amount}}",
-                        "{{this.current_balance}}"
+                        "{{this.current_balance}}",
+                        "{{this.processed}}"
                     ]{{#unless @last}},{{/unless}}
                 {{/each}}
             ];
 
             let currentIndex = 0; // Tracks how many rows are displayed
             const rowsPerPage = 25;
+
             const tableBody = document.getElementById("table-body");
             const loadMoreBtn = document.getElementById("load-more-button");
 
             function showMoreRows() {
                 const nextIndex = Math.min(currentIndex + rowsPerPage, transactions.length);
 
-                for (let i = currentIndex; i < nextIndex; i++) {
+                for(let i = currentIndex; i < nextIndex; i++) {
                     let row = document.createElement("tr");
                     row.innerHTML = `
                 <td>${transactions[i][0]}</td>
                 <td>${transactions[i][1]}</td>
                 <td>${transactions[i][2]}</td>
                 <td>${transactions[i][3]}</td>
+                <td>${transactions[i][4]}</td>
                 <td><button class="view-btn">See Details</button></td>
             `;
                     tableBody.appendChild(row);
@@ -99,8 +103,9 @@
                     const description = row.children[1].textContent;
                     const amount = row.children[2].textContent;
                     const balance = row.children[3].textContent;
+                    const processed = row.children[4].textContent;
 
-                    alert(`Transaction Details:\n\nDate: ${date}\nTo/From: ${description}\nAmount: ${amount}\nBalance: ${balance}`);
+                    alert(`Transaction Details:\n\nDate: ${date}\nTo/From: ${description}\nAmount: ${amount}\nBalance: ${balance}\nProcessed: ${processed}`);
                 }
             });
 

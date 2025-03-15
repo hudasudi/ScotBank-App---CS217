@@ -12,8 +12,6 @@ import uk.co.asepstrath.bank.api.parsers.AccountAPIParser;
 import uk.co.asepstrath.bank.api.parsers.BusinessAPIParser;
 import uk.co.asepstrath.bank.api.parsers.TransactionAPIParser;
 import uk.co.asepstrath.bank.view.AccountController_;
-import uk.co.asepstrath.bank.view.BusinessController_;
-import uk.co.asepstrath.bank.view.TransactionController_;
 import uk.co.asepstrath.bank.view.AdminController_;
 
 import javax.sql.DataSource;
@@ -46,8 +44,6 @@ public class App extends Jooby {
         Logger log = getLog();
 
         mvc(new AccountController_(log, ds));
-        mvc(new BusinessController_(log, ds));
-        mvc(new TransactionController_(log, ds));
         mvc(new AdminController_(log, ds));
 
         /*

@@ -1,17 +1,19 @@
 package uk.co.asepstrath.bank.view;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.Path;
-
 import io.jooby.annotation.QueryParam;
+
 import org.slf4j.Logger;
 
+import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Transaction;
+
 import javax.sql.DataSource;
+
 import java.math.BigDecimal;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,27 +25,30 @@ public class AdminController extends Controller {
 	/** This class controls the Jooby formatting & deployment of admin pages to the site
 	 * @param log The program log
 	 * @param ds The DataSource to pull from
-	*/
+	 */
 	public AdminController(Logger log, DataSource ds) {
 		super(log, ds);
 	}
 
-	/** Get & populate the handlebars template with information from the API
+	/** Get all account information for this bank
 	 * @return The model to build & deploy
-	*/
+	 */
 	@GET("/dashboard")
 	public ModelAndView<Map<String, Object>> getDashboard() {
-		JsonArray accounts = this.account_manipulator.getApiInformation();
+		ArrayList<Account> accounts = this.account_manipulator.jsonToAccounts();
 		List<Map<String, Object>> account_list = new ArrayList<>();
 
 		int account_count = 0;
 		BigDecimal bank_value = BigDecimal.ZERO;
 
-		for(int i = 0; i < accounts.size(); i++) {
-			JsonObject account = accounts.get(i).getAsJsonObject();
+		for(Account account : accounts) {
+			// Get actual bank value
+			Map<String, Object> actual_value = this.transaction_manipulator.getBalanceForAccount(account);
+			account = (Account) actual_value.get("account");
 
-			Map<String, Object> account_map = this.account_manipulator.createJsonMap(account);
-			bank_value = bank_value.add(BigDecimal.valueOf(account.get("startingBalance").getAsDouble()));
+			bank_value = bank_value.add(account.getBalance());
+
+			Map<String, Object> account_map = this.account_manipulator.createAccountMap(account);
 
 			account_list.add(account_map);
 			account_count++;
@@ -57,88 +62,63 @@ public class AdminController extends Controller {
 		return new ModelAndView<>("admin/admin_dashboard.hbs", model);
 	}
 
+	/** Get an accounts details for the admin
+	 * @param uuid The accounts UUID
+	 * @return The model to build & deploy
+	*/
 	@GET("/account")
+	@SuppressWarnings("unchecked")
 	public ModelAndView<Map<String, Object>> getSingleAccount(@QueryParam String uuid) {
 		try {
 			if(uuid == null) {
 				return this.getDashboard();
 			}
 
-			JsonArray result = this.account_manipulator.getApiInformation();
-			JsonObject account = null;
-
-			for(JsonElement acc : result) {
-				JsonObject acc_obj = acc.getAsJsonObject();
-
-				if(uuid.equals(acc_obj.get("id").getAsString())) {
-					account = acc_obj;
-				}
-			}
+			Account account = this.account_manipulator.getAccountByUUID(uuid);
 
 			if(account == null) {
-				return this.buildErrorPage("Error - Account not Found", "The account you're looking for was not found");
+				return this.buildErrorPage("Error 404 - Account Not Found", "The account you're looking for was not found");
 			}
 
-			String acc_name = account.get("name").getAsString();
-
 			// Get Transaction Info
-			JsonArray transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
+			Map<String, Object> saved_account_info = this.transaction_manipulator.getBalanceForAccount(account);
 
-			// Calculate actual balance
-			BigDecimal account_balance = account.get("startingBalance").getAsBigDecimal();
+			ArrayList<Transaction> transactions = (ArrayList<Transaction>) saved_account_info.get("transactions");
+			account = (Account) saved_account_info.get("account");
 
 			List<Map<String, Object>> in_transactions = new ArrayList<>();
 			List<Map<String, Object>> out_transactions = new ArrayList<>();
 
-			for(int i = 0; i < transactions.size(); i++) {
-				JsonObject transaction = transactions.get(i).getAsJsonObject();
+			// Backwards so transactions are most recent
+			for(int i = transactions.size(); i > 0; i--) {
+				Transaction transaction = transactions.get(i-1);
 
-				Map<String, Object> transaction_map = this.transaction_manipulator.createJsonMap(transaction);
+				if(transaction.getType().equals("PAYMENT") || transaction.getType().equals("WITHDRAWAL")) {
+					out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+				}
 
-				if(transaction.get("type").getAsString().equals("PAYMENT") || transaction.get("type").getAsString().equals("WITHDRAWAL")) {
-					if(account_balance.compareTo(transaction.get("amount").getAsBigDecimal()) >= 0 || transaction.get("type").getAsString().equals("PAYMENT")) {
-						account_balance = account_balance.subtract(transaction.get("amount").getAsBigDecimal());
-						transaction_map.put("processed", "ACCEPTED");
-						out_transactions.add(transaction_map);
+				else if(transaction.getType().equals("DEPOSIT")) {
+					in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+				}
+
+				else if(transaction.getType().equals("TRANSFER")) {
+					if(transaction.getSender().equals(account.getName())) {
+						out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
 					}
 
 					else {
-						transaction_map.put("processed", "DECLINED");
-						out_transactions.add(transaction_map);
+						in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
 					}
 				}
 
-				else if(transaction.get("type").getAsString().equals("TRANSFER")) {
-					// We're sending money out
-					if(transaction.get("sender").getAsString().equals(acc_name)) {
-						account_balance = account_balance.subtract(transaction.get("amount").getAsBigDecimal());
-						transaction_map.put("processed", "ACCEPTED");
-						out_transactions.add(transaction_map);
-					}
-
-					// We're receiving money in
-					else {
-						account_balance = account_balance.add(transaction.get("amount").getAsBigDecimal());
-						in_transactions.add(this.transaction_manipulator.createJsonMap(transaction));
-					}
-				}
-
-				else if (transaction.get("type").getAsString().equals("DEPOSIT")) {
-					account_balance = account_balance.add(transaction.get("amount").getAsBigDecimal());
-					transaction_map.put("sender", "Deposit");
-					in_transactions.add(transaction_map);
-				}
-
-				// We don't know what type of transaction
 				else {
-					System.out.println(transaction);
+					continue;
 				}
 			}
 
-			account.addProperty("startingBalance", account_balance);
-
 			Map<String, Object> model = new HashMap<>();
-			model.put("account", this.account_manipulator.createJsonMap(account));
+
+			model.put("account", this.account_manipulator.createAccountMap(account));
 			model.put("income", in_transactions);
 			model.put("outgoings", out_transactions);
 

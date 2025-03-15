@@ -1,12 +1,11 @@
 package uk.co.asepstrath.bank.view;
 
-import com.google.gson.JsonElement;
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+
 import io.jooby.annotation.Path;
 import io.jooby.annotation.QueryParam;
+
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
 import uk.co.asepstrath.bank.Transaction;
@@ -37,92 +36,95 @@ public class AccountController extends Controller {
 	public ModelAndView<Map<String, Object>> getAccount(@QueryParam String uuid) {
 		try {
 			if(uuid == null) {
-				return null;
+				return this.buildErrorPage("Error 400 - Bad Request", "No UUID provided!");
 			}
 
-			JsonArray result = this.account_manipulator.getApiInformation();
-			JsonObject account = null;
-
-			for(JsonElement acc : result) {
-				JsonObject acc_obj = acc.getAsJsonObject();
-
-				if(uuid.equals(acc_obj.get("id").getAsString())) {
-					account = acc_obj;
-				}
-			}
+			Account account = this.account_manipulator.getAccountByUUID(uuid);
 
 			if(account == null) {
-				return this.buildErrorPage("Error - Account not Found", "The account you're looking for was not found");
+				return this.buildErrorPage("Error 404 - Account Not Found", "The account you're looking for was not found");
 			}
 
-			String acc_name = account.get("name").getAsString();
-
 			// Get Transaction Info
-			JsonArray transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
-
-			// Calculate actual balance
-			BigDecimal account_balance = account.get("startingBalance").getAsBigDecimal();
+			ArrayList<Transaction> transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
 
 			List<Map<String, Object>> in_transactions = new ArrayList<>();
 			List<Map<String, Object>> out_transactions = new ArrayList<>();
 
-			int in_count = 0; // If count = 5, we stop putting transaction data into list
+			// If count = 5, we stop putting transaction data into lists
+			int in_count = 0;
 			int out_count = 0;
 
-			for(int i = 0; i < transactions.size(); i++) {
-				JsonObject transaction = transactions.get(i).getAsJsonObject();
+			for(Transaction transaction : transactions) {
 
-				Map<String, Object> transaction_map = this.transaction_manipulator.createJsonMap(transaction);
-
-				if(transaction.get("type").getAsString().equals("PAYMENT") || transaction.get("type").getAsString().equals("WITHDRAWAL")) {
-					if(account_balance.compareTo(transaction.get("amount").getAsBigDecimal()) >= 0 || transaction.get("type").getAsString().equals("PAYMENT")) {
-						account_balance = account_balance.subtract(transaction.get("amount").getAsBigDecimal());
-						transaction_map.put("processed", "ACCEPTED");
-						if(out_count <= 5) out_transactions.add(transaction_map);
-						out_count++;
+				// Payments allow overdraft
+				if(transaction.getType().equals("PAYMENT")) {
+					if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+						account.withdraw(transaction.getAmount(), true);
+						transaction.setProcessed(true);
 					}
 
-					else {
-						transaction_map.put("processed", "DECLINED");
-						if(out_count <= 5) out_transactions.add(transaction_map);
-						out_count++;
-					}
+					if(out_count <= 5) out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+					out_count++;
 				}
 
-				else if(transaction.get("type").getAsString().equals("TRANSFER")) {
+				// Withdrawals do not allow overdraft
+				else if(transaction.getType().equals("WITHDRAWAL")) {
+					if(account.getBalance().compareTo(transaction.getAmount()) >= 0) {
+						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+							account.withdraw(transaction.getAmount(), false);
+							transaction.setProcessed(true);
+						}
+					}
+
+					if(out_count <= 5) out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+					out_count++;
+				}
+
+				else if(transaction.getType().equals("DEPOSIT")) {
+					if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+						account.deposit(transaction.getAmount());
+						transaction.setProcessed(true);
+					}
+
+					if(in_count <= 5) in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+					in_count++;
+				}
+
+				// Transfers between accounts (Does not allow overdraft)
+				else if(transaction.getType().equals("TRANSFER")) {
+
 					// We're sending money out
-					if(transaction.get("sender").getAsString().equals(acc_name)) {
-						account_balance = account_balance.subtract(transaction.get("amount").getAsBigDecimal());
-						transaction_map.put("processed", "ACCEPTED");
-						if(out_count <= 5) out_transactions.add(transaction_map);
+					if(transaction.getSender().equals(account.getName())) {
+						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+							account.withdraw(transaction.getAmount(), false);
+							transaction.setProcessed(true);
+						}
+
+						if(out_count <= 5) out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
 						out_count++;
 					}
 
-					// We're receiving money in
+					// We're getting money in
 					else {
-						account_balance = account_balance.add(transaction.get("amount").getAsBigDecimal());
-						if(in_count <= 5) in_transactions.add(this.transaction_manipulator.createJsonMap(transaction));
+						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+							account.deposit(transaction.getAmount());
+							transaction.setProcessed(true);
+						}
+
+						if(in_count <= 5) in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
 						in_count++;
 					}
 				}
 
-				else if (transaction.get("type").getAsString().equals("DEPOSIT")) {
-					account_balance = account_balance.add(transaction.get("amount").getAsBigDecimal());
-					transaction_map.put("sender", "Deposit");
-					if(in_count <= 5) in_transactions.add(transaction_map);
-					in_count++;
-				}
-
-				// We don't know what type of transaction
+				// Unknown Transaction Type
 				else {
 					System.out.println(transaction);
 				}
 			}
 
-			account.addProperty("startingBalance", account_balance);
-
 			Map<String, Object> model = new HashMap<>();
-			model.put("account", this.account_manipulator.createJsonMap(account));
+			model.put("account", this.account_manipulator.createAccountMap(account));
 			model.put("income", in_transactions);
 			model.put("outgoings", out_transactions);
 
@@ -139,8 +141,8 @@ public class AccountController extends Controller {
 	@GET("/details")
 	public ModelAndView<Map<String, Object>> getAccountDetails(@QueryParam String uuid) {
 		try {
-			if (uuid == null) {
-				return null;
+			if(uuid == null) {
+				return this.buildErrorPage("Error 400 - Bad Request", "No UUID provided!");
 			}
 
 			return this.buildErrorPage("PAGE UNDER CONSTRUCTION", "The Frontend design for this page is not yet complete");
@@ -156,8 +158,14 @@ public class AccountController extends Controller {
 	@GET("/summary")
 	public ModelAndView<Map<String, Object>> getAccountSummary(@QueryParam String uuid) {
 		try {
-			if (uuid == null) {
-				return null;
+			if(uuid == null) {
+				return this.buildErrorPage("Error 400 - Bad Request", "No UUID provided!");
+			}
+
+			Account account = this.account_manipulator.getAccountByUUID(uuid);
+
+			if(account == null) {
+				return this.buildErrorPage("Error 404 - Account Not Found", "Account with UUID " + uuid + " not found");
 			}
 
 			HashMap<String, BigDecimal> out = new HashMap<>();
@@ -170,37 +178,30 @@ public class AccountController extends Controller {
 			ArrayList<Transaction> transactions = this.transaction_manipulator.jsonToTransactions();
 
 			for(Transaction t : transactions) {
-				if(t.getSender().equals(uuid)) {
-					for(Business b : businesses) {
-						if(out.get(b.getCategory()) != null) {
-							out.put(b.getCategory(), out.get(b.getCategory()).add(t.getAmount()));
+
+				// Only look at payments
+				if(t.getType().equals("PAYMENT")) {
+
+					// If payment sender is our account
+					if(t.getSender().equals(uuid)) {
+
+						for(Business b : businesses) {
+							// Check if a business is a recipient
+							if(t.getRecipient().equals(b.getId())) {
+								// Add the amount to the total for the category & break
+								out.put(b.getCategory(), out.get(b.getCategory()).add(t.getAmount()));
+								break;
+							}
 						}
 					}
 				}
-			}
-
-			JsonObject account_obj = null;
-
-			JsonArray arr = this.account_manipulator.getApiInformation();
-
-			for(JsonElement a : arr) {
-				JsonObject obj = a.getAsJsonObject();
-
-				if(obj.get("id").getAsString().equals(uuid)) {
-					account_obj = obj;
-					break;
-				}
-			}
-
-			if(account_obj == null) {
-				return this.buildErrorPage("Error - 404 Account Not Found", "Account with UUID " + uuid + " not found");
 			}
 
 			List<Map.Entry<String, BigDecimal>> category_list = new ArrayList<>(out.entrySet());
 
 			Map<String, Object> model = new HashMap<>();
 
-			model.put("account", this.account_manipulator.createJsonMap(account_obj));
+			model.put("account", this.account_manipulator.createAccountMap(account));
 			model.put("categories", category_list);
 
 			return new ModelAndView<>("account/summary.hbs", model);
@@ -216,95 +217,108 @@ public class AccountController extends Controller {
 	@GET("/transactions")
 	public ModelAndView<Map<String, Object>> getAccountTransactionDetails(@QueryParam String uuid) {
 		try {
-			if (uuid == null) {
-				return null;
+			if(uuid == null) {
+				return this.buildErrorPage("Error 400 - Bad Request", "No UUID provided!");
 			}
 
-			JsonArray accounts = this.account_manipulator.getApiInformation();
-			JsonObject account = null;
-
-			for(JsonElement e : accounts) {
-				JsonObject obj = e.getAsJsonObject();
-
-				if(obj.get("id").getAsString().equals(uuid)) {
-					account = obj;
-					break;
-				}
-			}
+			Account account = this.account_manipulator.getAccountByUUID(uuid);
 
 			if(account == null) {
-				return this.buildErrorPage("Error - 404 Account Not Found", "Account with UUID " + uuid + " not found");
+				return this.buildErrorPage("Error 404 - Account Not Found", "Account with UUID " + uuid + " not found");
 			}
 
-			JsonArray transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
+			ArrayList<Transaction> transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
 
 			List<Map<String, Object>> transaction_list = new ArrayList<>();
 
 			BigDecimal income = BigDecimal.valueOf(0);
 			BigDecimal outgoings = BigDecimal.valueOf(0);
-			BigDecimal balance = account.get("startingBalance").getAsBigDecimal();
 
-			for(JsonElement e : transactions) {
-				JsonObject obj = e.getAsJsonObject();
-				Map<String, Object> obj_map = new HashMap<>();
+			for(Transaction transaction : transactions) {
+				Map<String, Object> transaction_map = new HashMap<>();
 
-				obj_map.put("timestamp", obj.get("timestamp").getAsString());
+				transaction_map.put("timestamp", transaction.getTimestamp());
 
-				if(obj.get("type").getAsString().equals("WITHDRAWAL") || obj.get("type").getAsString().equals("PAYMENT")) {
-					balance = balance.subtract(obj.get("amount").getAsBigDecimal());
+				if(transaction.getType().equals("PAYMENT")) {
+					if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+						account.withdraw(transaction.getAmount(), true);
 
-					obj_map.put("amount", "-"+obj.get("amount").getAsString());
-					obj_map.put("to-from", obj.get("recipient").getAsString());
-					obj_map.put("current_balance", balance);
+						transaction.setProcessed(true);
 
-					transaction_list.add(obj_map);
-					outgoings = outgoings.add(obj.get("amount").getAsBigDecimal());
-				}
-
-				else if(obj.get("type").getAsString().equals("DEPOSIT")) {
-					balance = balance.add(obj.get("amount").getAsBigDecimal());
-
-					obj_map.put("amount", "+"+obj.get("amount").getAsString());
-					obj_map.put("to-from", "Deposit");
-					obj_map.put("current_balance", balance);
-
-					transaction_list.add(obj_map);
-					income = income.add(obj.get("amount").getAsBigDecimal());
-				}
-
-				else if(obj.get("type").getAsString().equals("TRANSFER")) {
-					if(obj.get("sender").getAsString().equals(uuid)) {
-						balance = balance.subtract(obj.get("amount").getAsBigDecimal());
-
-						obj_map.put("amount", "-"+obj.get("amount").getAsString());
-						obj_map.put("to-from", obj.get("recipient").getAsString());
-						obj_map.put("current_balance", balance);
-
-						outgoings = outgoings.add(obj.get("amount").getAsBigDecimal());
+						outgoings = outgoings.add(transaction.getAmount());
 					}
 
+					transaction_map.put("amount", "-" + transaction.getAmount().toString());
+				}
+
+				else if(transaction.getType().equals("WITHDRAWAL")) {
+					if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
+						account.withdraw(transaction.getAmount(), false);
+						transaction.setProcessed(true);
+
+						outgoings = outgoings.add(transaction.getAmount());
+					}
+
+					transaction_map.put("amount", "-" + transaction.getAmount().toString());
+				}
+
+				else if(transaction.getType().equals("DEPOSIT")) {
+					if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+						account.deposit(transaction.getAmount());
+						transaction.setProcessed(true);
+
+						income = income.add(transaction.getAmount());
+					}
+
+					transaction_map.put("amount", "+" + transaction.getAmount().toString());
+				}
+
+				else if(transaction.getType().equals("TRANSFER")) {
+					// We're sending money out
+					if(transaction.getSender().equals(uuid)) {
+						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+							if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
+								account.withdraw(transaction.getAmount(), false);
+								transaction.setProcessed(true);
+
+								outgoings = outgoings.add(transaction.getAmount());
+							}
+						}
+
+						transaction_map.put("amount", "-" + transaction.getAmount().toString());
+					}
+
+					// We're getting money in
 					else {
-						balance = balance.add(obj.get("amount").getAsBigDecimal());
+						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+							account.deposit(transaction.getAmount());
+							transaction.setProcessed(true);
 
-						obj_map.put("amount", "+"+obj.get("amount").getAsString());
-						obj_map.put("to-from", obj.get("sender").getAsString());
-						obj_map.put("current_balance", balance);
+							income = income.add(transaction.getAmount());
+						}
 
-						income = income.add(obj.get("amount").getAsBigDecimal());
+						transaction_map.put("amount", "+" + transaction.getAmount().toString());
 					}
 				}
 
+				// We don't know the transaction type
 				else {
-					continue;
+					System.out.println(transaction);
 				}
+
+				transaction_map.put("to-from", transaction.getRecipient());
+				transaction_map.put("current_balance", account.getBalance());
+				transaction_map.put("processed", transaction.isProcessed() ? "PROCESSED" : "DECLINED");
+
+				transaction_list.add(transaction_map);
 			}
 
 			Map<String, Object> model = new HashMap<>();
+
 			model.put("transactions", transaction_list);
-			model.put("balance", balance);
 			model.put("income", income);
 			model.put("outgoings", outgoings);
-			model.put("account", this.account_manipulator.createJsonMap(account));
+			model.put("account", this.account_manipulator.createAccountMap(account));
 
 			return new ModelAndView<>("account/transactions.hbs", model);
 		}
@@ -314,36 +328,5 @@ public class AccountController extends Controller {
 		}
 
 		return null;
-	}
-
-	/** Get an array of Account from the JSON information in the Database & return their information in String form
-	 * @return The JSON information as a String
-	 * @deprecated
-	*/
-	@Deprecated
-	@GET("/account-objects")
-	public String accountsObjects() {
-		ArrayList<Account> array = this.account_manipulator.jsonToAccounts();
-
-		StringBuilder out = new StringBuilder();
-
-		for(Account a : array) {
-			out.append(a.toString()).append("\n\n");
-		}
-
-		return out.toString();
-	}
-
-	/** Get specific account information from a user query in the URL
-	 * @param pos The Account JSON to get
- 	 * @return The Account JSON information as a String
-	 * @deprecated Use getAccount instead
-	 */
-	@Deprecated
-	@GET("/account-object")
-	public String accountsObject(@QueryParam int pos) {
-		ArrayList<Account> array = this.account_manipulator.jsonToAccounts();
-
-		return array.get(pos).toString();
 	}
 }

@@ -2,12 +2,9 @@ package uk.co.asepstrath.bank.api.manipulators;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import org.slf4j.Logger;
-
 import javax.sql.DataSource;
 import java.sql.*;
-
 import java.util.*;
 
 public abstract class APIManipulator {
@@ -23,7 +20,7 @@ public abstract class APIManipulator {
 		this.ds = ds;
 	}
 
-	/** Make a Json Object with an APIs information
+	/** Make a JsonObject with an APIs information
 	 * @param set The ResultSet to pull data from
 	 * @return a JsonObject containing all necessary information
 	*/
@@ -125,6 +122,7 @@ public abstract class APIManipulator {
 	/** Get the API information stored in db, parse it into a JsonArray & return it
 	 * @return The API Information
 	*/
+	@SuppressWarnings("All")
 	public JsonArray getApiInformation() {
 		JsonArray arr = new JsonArray();
 

@@ -3,12 +3,9 @@ package uk.co.asepstrath.bank.api.parsers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
-
 import javax.sql.DataSource;
 import java.sql.*;
-
 import java.io.IOException;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -91,6 +88,7 @@ public abstract class APIParser {
     /**
      * Write the API JSON response to the db for use later
     */
+	@SuppressWarnings("All")
 	public void writeAPIInformation() {
 		JsonArray response_array = this.parseResponse();
 
