@@ -1,5 +1,7 @@
 package uk.co.asepstrath.bank.view;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
 import com.google.gson.JsonArray;
@@ -108,6 +110,25 @@ public class AccountController {
 	public String accountsObject(@QueryParam int pos) {
 		ArrayList<Account> array = this.manip.jsonToAccounts();
 
-		return array.get(pos).toString();
+		JsonArray arr = manip.getApiInformation();
+
+		for(int i = 0; i < arr.size(); i++) {
+			JsonObject obj = arr.get(i).getAsJsonObject();
+
+			if(is_admin) {
+				if(obj.get("id").toString().equals("\""+uuid+"\"")) {
+					return new ModelAndView<>("account_admin.hbs", manip.createJsonMap(obj));
+				}
+			}
+
+			else {
+				if(obj.get("id").toString().equals("\""+uuid+"\"")) {
+					return new ModelAndView<>("account.hbs", manip.createJsonMap(obj));
+				}
+			}
+		}
+
+		log.error("Unable to find an account with that uuid");
+		return null;
 	}
 }

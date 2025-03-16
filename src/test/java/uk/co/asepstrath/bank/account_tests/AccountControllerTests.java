@@ -84,7 +84,7 @@ public class AccountControllerTests {
 
         // Check HTTP output
         Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/account-object?pos=0")
+                .url("http://localhost:"+serverPort+"/accounts/account?uuid=c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2&is_admin=false")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
