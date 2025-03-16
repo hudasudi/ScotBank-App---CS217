@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Error 404</title>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <style>
+            :root {
+                --bg-clr: #111;
+                --txt-clr: #fff;
+            }
+
+            body, html {
+                background-color: var(--bg-clr);
+                color: var(--txt-clr);
+                font-size: 1rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                margin: 0;
+            }
+
+            div.error {
+                background-color: rgb(156, 0, 0);
+                padding: 50px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            h1.err-title {
+                font-size: 2rem;
+            }
+
+            p.err-info {
+                font-size: 2rem;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="error">
+            <div>
+                <h1 class="err-title">Error: <b>{{err}}</b></h1>
+                <p class='err-info'>{{msg}}</p>
+            </div>
+        </div>
+
+        <script
+                src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+                integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+                crossorigin="anonymous">
+        </script>
+    </body>
+</html>

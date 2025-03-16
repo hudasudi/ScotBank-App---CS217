@@ -7,26 +7,47 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.api.AccountAPIManipulator;
 import uk.co.asepstrath.bank.api.AccountAPIParser;
 
+import javax.sql.DataSource;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class AccountAPIParserTests {
 
-    // Make sure APIParser writes the right information for Manipulator to use
-    @Test
-    public void shouldWriteCorrectly() {
-        try {
-            AccountAPIParser parser = new AccountAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/accounts", "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
+	// Make sure the APIParser writes the right information for Manipulator to use
+	@Test
+	public void shouldWriteCorrectly() {
+		try {
+			// Make mock data source to write to
+			DataSource mockDataSource = mock(DataSource.class);
 
-            parser.writeAPIInformation();
+			// Make parser & write to mock source
+			AccountAPIParser parser = new AccountAPIParser(mock(Logger.class), "https://api.asep-strath.co.uk/api/accounts", mockDataSource);
+			parser.writeAPIInformation();
 
-            AccountAPIManipulator manip = new AccountAPIManipulator(mock(Logger.class), "src/test/java/uk/co/asepstrath/bank/account_tests/api.json");
+			// Create manipulator to test data pass through
+			AccountAPIManipulator manip = new AccountAPIManipulator(mock(Logger.class), mockDataSource);
 
-            assertNotNull(manip.getApiInformation());
+			// Get that the API info is retrieved from the mock db properly
+			assertNotNull(manip.getApiInformation());
 
-            JsonObject obj = manip.getApiInformation().get(0).getAsJsonObject();
+			// Check an example JsonObject for its contents
+			JsonObject obj = manip.getApiInformation().get(0).getAsJsonObject();
 
-            assertEquals("\"Miss Lavina Waelchi\"", obj.get("name").toString());
-        } catch(Exception ignored) {}
-    }
+			assertEquals("Miss Lavina Waelchi", obj.get("name").toString());
+			assertEquals("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", obj.get("uuid").toString());
+			assertEquals(544.91, obj.get("balance").getAsDouble());
+			assertFalse(obj.get("roundUpEnabled").getAsBoolean());
+		} catch (Exception ignored) {}
+	}
+
+	// getAPIData
+	// Force Parser IOException
+	// Force Parser InterruptedException
+
+	// parseJSONResponse
+	// Force InterruptedException
+
+	// writeAPIInformation
+	// Force SQLException
 }
