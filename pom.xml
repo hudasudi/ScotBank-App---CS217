@@ -101,6 +101,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20250107</version>
+        </dependency>
 
         <!-- Mockito Inline for Mocking Final/Static Methods -->
         <dependency>
@@ -109,14 +115,6 @@
             <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.json/json -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20250107</version>
-        </dependency>
-
 
     </dependencies>
 
