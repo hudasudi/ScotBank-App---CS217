@@ -38,7 +38,8 @@ public class AccountAPIParserTests {
 			assertEquals("c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2", obj.get("uuid").toString());
 			assertEquals(544.91, obj.get("balance").getAsDouble());
 			assertFalse(obj.get("roundUpEnabled").getAsBoolean());
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	// getAPIData
