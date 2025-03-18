@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Details</title>
+        <link rel="stylesheet" href="../assets/static/css/account/dashboard.css">
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>Single Account View</h1>
+        </div>
+
+        <nav class="navbar">
+            <a class="active" href="/accounts/dashboard?uuid={{account.uuid}}">Home</a>
+            <a href="/accounts/details?uuid={{account.uuid}}">Account Details</a>
+            <a href="/accounts/transactions?uuid={{account.uuid}}">Transaction Details</a>
+            <a href="/accounts/summary?uuid={{account.uuid}}">Account Summary</a>
+        </nav>
+
+        <section class="overview">
+            <h2>Account Overview</h2>
+
+            <p><b>Account Holder: </b>{{account.name}}</p>
+            <p><b>Account ID: </b>{{account.uuid}}</p>
+            <p><b>Account Type: </b>Current Account</p>
+            <p><b>Current Balance: </b>£{{account.bal}}</p>
+        </section>
+
+        <section class="table-container">
+            <div class="income">
+                <h2>Income</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Sender</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {{#each income}}
+                        <tr>
+                            <td>{{timestamp}}</td>
+                            <td>{{sender}}</td>
+                            <td>+ £{{amount}}</td>
+                            <td><button class="view-btn">View</button></td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
+                <a href="/accounts/transactions?uuid={{account.uuid}}">View More</a>
+            </div>
+
+            <div class="outgoing">
+                <h2>Outgoings</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Recipient</th>
+                            <th>Amount</th>
+                            <th>Processed</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {{#each outgoings}}
+                        <tr>
+                            <td>{{timestamp}}</td>
+                            <td>{{recipient}}</td>
+                            <td>- £{{amount}}</td>
+                            <td>{{processed}}</td>
+                            <td><button class="view-btn">View</button></td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
+                <a href="/accounts/transactions?uuid={{account.uuid}}">View More</a>
+            </div>
+        </section>
+    </body>
+</html>

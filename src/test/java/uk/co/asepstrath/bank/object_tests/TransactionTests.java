@@ -54,6 +54,20 @@ public class TransactionTests {
 	@Test
 	public void toStringTest() {
 		assertNotNull(t.toString());
-		assertEquals("Transaction(\"TIME\", 0.0, \"SENDER\", \"ID\", \"RECEIVER\", \"TYPE\")", t.toString());
+		assertEquals("Transaction(\"TIME\", 0.0, \"SENDER\", \"ID\", \"RECEIVER\", \"TYPE\", false)", t.toString());
+	}
+
+	@Test
+	public void isProcessedTest() {
+		assertFalse(t.isProcessed());
+	}
+
+	@Test
+	public void setProcessedTest() {
+		assertFalse(t.isProcessed());
+
+		t.setProcessed(true);
+
+		assertTrue(t.isProcessed());
 	}
 }

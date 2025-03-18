@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import java.net.http.HttpResponse;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class TransactionAPIParser extends APIParser {
 
@@ -92,14 +93,22 @@ public class TransactionAPIParser extends APIParser {
 		stmt.setString(1, trimString(obj.get("timestamp").toString(), 1, 1));
 		stmt.setDouble(2, obj.get("amount").getAsDouble());
 
-		if (obj.get("from") != null) {
+		if(obj.get("from") != null) {
 			stmt.setString(3, trimString(obj.get("from").toString(), 1, 1));
+		}
+
+		else {
+			stmt.setNull(3, Types.NULL);
 		}
 
 		stmt.setString(4, trimString(obj.get("id").toString(), 1, 1));
 
 		if (obj.get("to") != null) {
 			stmt.setString(5, trimString(obj.get("to").toString(), 1, 1));
+		}
+
+		else {
+			stmt.setNull(5, Types.NULL);
 		}
 
 		stmt.setString(6, trimString(obj.get("type").toString(), 1, 1));

@@ -4,22 +4,25 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-
 import javax.sql.DataSource;
-
-import java.sql.ResultSet;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 
 public class AccountAPIManipulator extends APIManipulator {
 
+	/**
+	 * This class manipulates API information to format it into varied forms
+	 * @param log The program log
+	 * @param ds  The DataSource to pull info from
+	*/
 	public AccountAPIManipulator(Logger log, DataSource ds) {
 		super(log, ds);
 	}
 
+	/** Make a JsonObject with a given set of information
+	 * @param set The ResultSet to pull data from
+	 * @return A JsonObject for a single result inside the ResultSet
+	*/
 	@Override
 	protected JsonObject makeJsonObject(ResultSet set) {
 		try {
@@ -27,7 +30,7 @@ public class AccountAPIManipulator extends APIManipulator {
 
 			object.addProperty("id", set.getString("UUID"));
 			object.addProperty("name", set.getString("Name"));
-			object.addProperty("startingBalance", set.getString("Balance"));
+			object.addProperty("startingBalance", set.getBigDecimal("Balance"));
 			object.addProperty("roundUpEnabled", set.getBoolean("roundUpEnabled"));
 
 			return object;
@@ -39,19 +42,49 @@ public class AccountAPIManipulator extends APIManipulator {
 		}
 	}
 
+	/** Create a map with an accounts information
+	 * @param account The account to turn into a map
+	 * @return The map with account information
+	*/
+	public Map<String, Object> createAccountMap(Account account) {
+		// Make sure we don't crash on null
+		if(account == null) {
+			return null;
+		}
+
+		Map<String, Object> map = new HashMap<>();
+
+		map.put("uuid", account.getID());
+		map.put("name", account.getName());
+		map.put("bal", account.getBalance().toString());
+		map.put("round", account.isRoundUpEnabled() ? "Yes" : "No");
+
+		return map;
+	}
+
+	/** The query used on the Database
+	 * @return The query used in the database
+	*/
 	@Override
 	protected String getTableQuery() {
 		return "SELECT * FROM Accounts";
 	}
 
-	/** Take a JsonObject & Convert it into a Map of Key-Value Pairs
-	 * @param object The JsonObject to convert
-	 * @return A map of all the JsonObject's Key-Value Pairs
-	*/
+	/**
+     * Take a JsonObject & Convert it into a Map of Key-Value Pairs
+     *
+     * @param object The JsonObject to convert
+     * @return A map of all the JsonObject's Key-Value Pairs
+     */
 	@Override
-	public Map<String, String> createJsonMap(JsonObject object) {
+	public Map<String, Object> createJsonMap(JsonObject object) {
+		// Make sure we don't crash on null
+		if(object == null) {
+			return null;
+		}
+
 		// The account map for the JsonObject
-		Map<String, String> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 
 		// Put the JSON information into the account map
 		map.put("uuid", object.get("id").getAsString());
@@ -82,5 +115,21 @@ public class AccountAPIManipulator extends APIManipulator {
 		}
 
 		return accounts_list;
+	}
+
+	/** Find an account with a specific uuid
+	 * @param uuid The uuid to search for
+	 * @return The account with a specified uuid
+	*/
+	public Account getAccountByUUID(String uuid) {
+		ArrayList<Account> accounts = this.jsonToAccounts();
+
+		for(Account a : accounts) {
+			if(a.getID().equals(uuid)) {
+				return a;
+			}
+		}
+
+		return null;
 	}
 }

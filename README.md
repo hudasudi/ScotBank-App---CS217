@@ -1,6 +1,6 @@
 # Your-Bank
 
-Welcome to your-bank!!
+Welcome to your-bank!
 
 ## running
 

@@ -16,7 +16,6 @@ public class BusinessAPIManipulator extends APIManipulator {
 
 	/**
 	 * This class manipulates API information to format it into varied forms
-	 *
 	 * @param log The program log
 	 * @param ds  The DataSource to pull info from
 	 */
@@ -24,6 +23,10 @@ public class BusinessAPIManipulator extends APIManipulator {
 		super(log, ds);
 	}
 
+	/** Make a JsonObject with a given ResultSet
+	 * @param set The ResultSet to pull data from
+	 * @return a JsonObject with ResultSet values
+	*/
 	@Override
 	protected JsonObject makeJsonObject(ResultSet set) {
 		try {
@@ -43,14 +46,25 @@ public class BusinessAPIManipulator extends APIManipulator {
 		}
 	}
 
+	/** Get the database query to use on a database
+	 * @return The database query
+	*/
 	@Override
 	protected String getTableQuery() {
 		return "SELECT * FROM Businesses";
 	}
 
+	/** Create a Map with a JsonObject's values
+	 * @param object The JsonObject to convert
+	 * @return A map with the JsonObject's values
+	*/
 	@Override
-	public Map<String, String> createJsonMap(JsonObject object) {
-		Map<String, String> map = new HashMap<>();
+	public Map<String, Object> createJsonMap(JsonObject object) {
+		if(object == null) {
+			return null;
+		}
+
+		Map<String, Object> map = new HashMap<>();
 
 		map.put("id", object.get("id").getAsString());
 		map.put("name", object.get("name").getAsString());
@@ -62,7 +76,6 @@ public class BusinessAPIManipulator extends APIManipulator {
 
 	/**
 	 * Take the response JSON from the API, create a new Business from each element in the JSON array & return an ArrayList of created Businesses
-	 *
 	 * @return ArrayList<Business> of all businesses created from each JSON element
 	*/
 	public ArrayList<Business> jsonToBusinesses() {
