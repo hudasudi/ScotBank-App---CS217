@@ -67,7 +67,7 @@ public class AccountControllerTests {
             )).when(acc_manipulator).getAccountByUUID(anyString());
 
             // Fake transaction
-            ArrayList<Transaction> transaction = new ArrayList<Transaction>();
+            ArrayList<Transaction> transaction = new ArrayList<>();
             transaction.add(new Transaction(
                     "timestamp",
                     BigDecimal.valueOf(10),
@@ -279,7 +279,7 @@ public class AccountControllerTests {
             doReturn(businesses).when(bus_manipulator).jsonToBusinesses();
 
             // Fake transaction
-            ArrayList<Transaction> transaction = new ArrayList<Transaction>();
+            ArrayList<Transaction> transaction = new ArrayList<>();
             transaction.add(new Transaction(
                     "timestamp",
                     BigDecimal.valueOf(10),
@@ -409,7 +409,7 @@ public class AccountControllerTests {
             )).when(acc_manipulator).getAccountByUUID(anyString());
 
             // Fake transaction
-            ArrayList<Transaction> transaction = new ArrayList<Transaction>();
+            ArrayList<Transaction> transaction = new ArrayList<>();
             transaction.add(new Transaction(
                     "timestamp",
                     BigDecimal.valueOf(10),
