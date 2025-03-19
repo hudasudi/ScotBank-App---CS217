@@ -1,0 +1,184 @@
+body {
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-family: Arial, sans-serif;
+	background-color: #4f7896;
+	margin: 0;
+}
+
+/* Page Header*/
+
+.header {
+	margin: 0;
+	font-size: 40px;
+	padding: 20px 10px;
+	text-align: center;
+	color: #f2f2f2;
+	background-color: #104973;
+}
+
+/* Navigation */
+
+nav.topnav {
+	width: 100%;
+	background-color: #333;
+	overflow: hidden;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: space-between;
+	outline: 1px solid black;
+}
+
+nav.topnav a {
+	flex: 1; /* Makes each link take up equal space */
+	color: #f2f2f2;
+	text-align: center;
+	padding: 14px 0; /* Adjust padding to keep links aligned */
+	text-decoration: none;
+	font-size: 17px;
+	transition: background 0.3s;
+	outline: 1px solid black;
+}
+
+nav.topnav a:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+nav.topnav a.active {
+	background-color: #538bb8;
+	color: white;
+}
+
+/* Transactions Overview */
+.trans-overview {
+	font-size: 19px;
+	border-radius: 12px;
+	background-color: #ffffff;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 30px;
+	width: 55%;
+	padding-right: 2%;
+	padding-left: 1%;
+	border: 1px solid black;
+	box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
+	text-align: center;
+	padding-top: 0;
+	padding-bottom: 15px;
+}
+
+.trans-overview h2{
+	text-align: center;
+}
+
+.trans-overview p{
+	margin-left: 5%;
+	padding:auto;
+	text-align: center;
+	margin-top: 0;
+	padding-top: 0;
+	display: inline;
+}
+
+/* Tables Layout */
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: white;
+}
+
+th, td {
+	padding: 14px;
+	border: 1px solid #ddd;
+	text-align: center;
+}
+
+tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+tr:hover {
+	background-color: #d3d3d3;
+}
+
+.tables-container {
+	display: flex;
+	justify-content: space-around;
+	margin-top: 20px;
+	width: 90%;
+	flex-wrap: wrap;
+	overflow-x: auto;
+	white-space: nowrap;
+}
+
+.tables-container h2 {
+	color: #f2f2f2;
+}
+	
+.transactions  {
+	border-radius: 12px;
+	border: 1px solid black;
+	box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
+	width:60%;
+	margin-top: 3%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 2.5%;
+	overflow-x: auto;
+	display: block;
+	white-space: nowrap;
+}
+
+.transactions h2 {
+	margin: 0;
+	color: white;
+	background-color: #104973;
+	padding: 10px 20px 10px;
+	margin-bottom: 0;
+	position: sticky;
+}
+
+.transactions p {
+	margin: 0;
+	color: white;
+	background-color: #333;
+	text-align: center;
+	padding: 10px 10px;
+	margin-bottom: 0;
+	display: block;
+}
+
+.transactions p:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+/* View Button */
+.view-btn {
+	background-color: #36709e;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.view-btn:hover {
+	background-color: #2a2929;
+}
+
+/* View More Content */
+.details-content {
+	display: flex;
+    gap: 20px;
+    padding: 10px;
+}
+
+.details-item {
+	flex: 1; /* Each item takes equal space */
+    min-width: 150px; /* Prevents items from shrinking too much */
+}
