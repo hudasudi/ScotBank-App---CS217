@@ -1,0 +1,184 @@
+/* USE THE LAYOUT BELOW FOR ANY CSS FILES
+The standard layout for CSS files is top to bottom, i.e. body elements, then navbar, then main etc
+Make sure to name your classes & ids well enough to not get confused
+Make sure to use comments to separate your sections, i.e. "Navigation" comment to show where navigation css goes
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #4f7896;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+p {
+    font-family: Roboto, Arial, sans-serif;
+}
+
+/* Page Header */
+
+h1.header {
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    font-size: 40px;
+    padding: 20px 10px;
+    text-align: center;
+    color: #f2f2f2;
+    background-color: #104973;
+}
+
+/* Navigation */
+
+nav.navbar {
+    width: 100%;
+    background-color: #333;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+nav.navbar a {
+    flex: 1;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 0;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+nav.navbar a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+nav.navbar a.active {
+    background-color: #36709e;
+    color: white;
+}
+
+/* Main Content */
+
+main.accounts {
+    display: flex;
+    flex-direction: column;
+    width: 80%; /* Make the table responsive */
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.accounts .header {
+    background-color: #104973;
+    color: white;
+    padding: 20px;
+    border-radius: 4px 4px 0 0;
+}
+
+.accounts .header h2 {
+    margin: 0;
+}
+
+.accounts .summary-info {
+    padding-left: 20px;
+}
+
+.accounts .summary-info p {
+    font-size: 20px;
+}
+
+div.divider {
+    background-color: #ddd;
+    height: 2px;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+h2.account-header {
+    padding-left: 20px;
+    font-size: 32px;
+}
+
+/* Search bar */
+.accounts .search {
+    width: 100%;
+    justify-content: center;
+    padding-right: 20px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+#search-bar {
+    background-image: url('https://www.w3schools.com/css/searchicon.png');
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Accounts table */
+.accounts .table {
+    padding: 20px;
+}
+
+.accounts .table table {
+    border-collapse: collapse;
+    background-color: white;
+    width: 100%;
+}
+
+.accounts .table table th,
+.accounts .table table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.accounts .table table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table .view-btn {
+    background-color: #36709e;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+}
+
+.view-btn:hover {
+    background-color: #224663;
+}
+
+/* Pagination Buttons */
+
+.accounts .pagination {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.accounts .pagination a {
+    color: blue;
+    font-size: 20px;
+}
+
+.accounts .pagination a.active {
+    text-decoration: none;
+}
