@@ -12,10 +12,10 @@
         </div>
 
         <nav class="navbar">
-            <a href="/accounts/dashboard?uuid={{account.uuid}}">Home</a>
-            <a href="/accounts/details?uuid={{account.uuid}}">Account Details</a>
-            <a href="/accounts/transactions?uuid={{account.uuid}}">Transaction Details</a>
-            <a class="active" href="/accounts/summary?uuid={{account.uuid}}">Account Summary</a>
+            <a href="/account/dashboard">Home</a>
+            <a href="/account/details">Account Details</a>
+            <a href="/account/transactions">Transaction Details</a>
+            <a class="active" href="/account/summary">Account Summary</a>
         </nav>
 
         <section class="table-container">
@@ -26,7 +26,6 @@
                     <thead>
                         <tr>
                             <th>Category</th>
-                            <th>Date</th>
                             <th>Amount Spent (£)</th>
                         </tr>
                     </thead>
@@ -35,7 +34,6 @@
                         {{#each categories}}
                             <tr>
                                 <td>{{this.key}}</td>
-                                <td>??/??/????</td>
                                 <td>{{this.value}}</td>
                             </tr>
                         {{/each}}

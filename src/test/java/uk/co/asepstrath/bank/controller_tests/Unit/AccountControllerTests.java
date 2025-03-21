@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank.controller_tests.Unit;
 
+import io.jooby.Context;
 import io.jooby.ModelAndView;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class AccountControllerTests {
             doReturn(transaction).when(transaction_manip).getTransactionForAccount(anyString());
 
             // Get created model
-            ModelAndView<Map<String, Object>> model_uuid = control.getAccount("AAA");
+            ModelAndView<Map<String, Object>> model_uuid = control.getAccount(mock(Context.class));
             Map<String, Object> uuid_map = model_uuid.getModel();
 
             // Make sure it's not null
@@ -118,7 +119,7 @@ public class AccountControllerTests {
 
             doReturn(null).when(manipulator).getAccountByUUID(anyString());
 
-            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccount("AA");
+            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccount(mock(Context.class));
             Map<String, Object> no_uuid_map = model_no_uuid.getModel();
 
             assertNotNull(model_no_uuid);
@@ -144,7 +145,7 @@ public class AccountControllerTests {
 
             doThrow(new NullPointerException("Error out")).when(acc_manipulator).getAccountByUUID(anyString());
 
-            ModelAndView<Map<String, Object>> model_error = control.getAccount("AAA");
+            ModelAndView<Map<String, Object>> model_error = control.getAccount(mock(Context.class));
 
             assertNull(model_error);
         }
@@ -182,7 +183,7 @@ public class AccountControllerTests {
 
             AccountController control = new AccountController(mock(Logger.class), mockDataSource);
 
-            ModelAndView<Map<String, Object>> model_uuid = control.getAccountDetails("ABC");
+            ModelAndView<Map<String, Object>> model_uuid = control.getAccountDetails(mock(Context.class));
             Map<String, Object> uuid_map = model_uuid.getModel();
 
             assertNotNull(model_uuid);
@@ -229,7 +230,7 @@ public class AccountControllerTests {
 
             doReturn(null).when(manipulator).getAccountByUUID(anyString());
 
-            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccountSummary("AA");
+            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccountSummary(mock(Context.class));
             Map<String, Object> no_uuid_map = model_no_uuid.getModel();
 
             assertNotNull(model_no_uuid);
@@ -292,7 +293,7 @@ public class AccountControllerTests {
             doReturn(transaction).when(transaction_manip).getTransactionForAccount(anyString());
 
             // Get created model
-            ModelAndView<Map<String, Object>> model_uuid = control.getAccount("ACCOUNTID");
+            ModelAndView<Map<String, Object>> model_uuid = control.getAccount(mock(Context.class));
             Map<String, Object> uuid_map = model_uuid.getModel();
 
             // Make sure it's not null
@@ -327,7 +328,7 @@ public class AccountControllerTests {
 
             doThrow(new NullPointerException("Error out")).when(bus_manipulator).jsonToBusinesses();
 
-            ModelAndView<Map<String, Object>> model_error = control.getAccountTransactionDetails("AAA");
+            ModelAndView<Map<String, Object>> model_error = control.getAccountTransactionDetails(mock(Context.class));
 
             assertNull(model_error);
         }
@@ -370,7 +371,7 @@ public class AccountControllerTests {
 
             doReturn(null).when(manipulator).getAccountByUUID(anyString());
 
-            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccountTransactionDetails("AA");
+            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccountTransactionDetails(mock(Context.class));
             Map<String, Object> no_uuid_map = model_no_uuid.getModel();
 
             assertNotNull(model_no_uuid);
@@ -421,7 +422,7 @@ public class AccountControllerTests {
 
             doReturn(transaction).when(transaction_manip).getTransactionForAccount(anyString());
 
-            ModelAndView<Map<String, Object>> model_uuid = control.getAccountTransactionDetails("AA");
+            ModelAndView<Map<String, Object>> model_uuid = control.getAccountTransactionDetails(mock(Context.class));
             Map<String, Object> uuid_map = model_uuid.getModel();
 
             assertNotNull(model_uuid);
@@ -450,7 +451,7 @@ public class AccountControllerTests {
 
             doThrow(new NullPointerException("Error out")).when(acc_manipulator).getAccountByUUID(anyString());
 
-            ModelAndView<Map<String, Object>> model_error = control.getAccountTransactionDetails("AAA");
+            ModelAndView<Map<String, Object>> model_error = control.getAccountTransactionDetails(mock(Context.class));
 
             assertNull(model_error);
         }

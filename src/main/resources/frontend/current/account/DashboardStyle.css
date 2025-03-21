@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Set all to have zero margins & padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	min-height: 100vh;
+	font-family: Arial, sans-serif;
+	background-color: #4f7896;
+	color: #333;
+}
+
+p {
+	font-family: Roboto, Arial, sans-serif;
+}
+
+/* Page Header */
+.header {
+	width: 100%;
+	text-align: center;
+    color: #f2f2f2;
+    background-color: #104973;
+	padding: 20px 10px;
+    font-size: 20px;
+}
+
+/* Navigation */
+nav.topnav {
+	width: 100%;
+	background-color: #333;
+	display: flex;
+	justify-content: space-around;
+	border: 2px solid #222;
+	border-right: 0;
+}
+
+nav.topnav a {
+	flex: 1;
+	color: #f2f2f2;
+	text-align: center;
+	padding: 14px 0;
+	text-decoration: none;
+	font-size: 17px;
+	transition: background 0.3s, color 0.3s;
+	border-right: 2px solid #222;
+}
+
+nav.topnav a:hover {
+	background-color: #ddd;
+	color: #333;
+}
+
+nav.topnav a.active {
+	background-color: #538bb8;
+	color: white;
+}
+
+/* Account Overview */
+.acc-overview {
+	font-size: 19px;
+	border-radius: 12px;
+	background-color: #ffffff;
+	padding: 20px;
+	margin: 30px auto 10px auto;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+	width: 60%;
+	text-align: center;
+}
+
+.acc-overview h2 {
+	margin-bottom: 10px;
+	color: #104973;
+}
+
+.acc-overview p {
+	margin: 8px 0;
+	font-size: 18px;
+}
+
+.acc-overview-total {
+	margin-top: 15px;
+	font-size: 20px;
+	font-weight: bold;
+	color: #36709e;
+}
+
+/* Tables Container */
+.tables-container {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 40px;
+	margin: 40px auto;
+	flex-wrap: wrap;
+	width: 90%;
+}
+
+/* Recent Transactions Tables Container */
+.recentTrans {
+	flex: 1 1 45%;
+	min-width: 400px;
+	border-radius: 12px;
+	background-color: #ffffff;
+	overflow-x: auto;
+	border-radius: 12px;
+	border: 1px solid black;
+	box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
+}
+
+.recentTrans h2 {
+	margin: 0;
+	background-color: #104973;
+	color: white;
+	padding: 15px 20px;
+	font-size: 22px;
+}
+
+.recentTrans a {
+	margin: 0;
+	background-color: #333;
+	color: white;
+	text-align: center;
+	padding: 12px 0;
+	text-decoration: none;
+	display: block;
+	transition: background 0.3s, color 0.3s;
+}
+
+.recentTrans a:hover {
+	background-color: #ddd;
+	color: #333;
+}
+
+/* Tables */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: white;
+}
+
+th, td {
+	padding: 14px;
+	border: 1px solid #ddd;
+	text-align: center;
+	font-size: 16px;
+}
+
+th {
+	background-color: #f4f4f4;
+	color: #333;
+}
+
+tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+tr:hover {
+	background-color: #d3d3d3;
+}
+
+/* View Button */
+.view-btn {
+	background-color: #36709e;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+
+.view-btn:hover {
+	background-color: #2a2929;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+	
+	.acc-overview {
+		width: 90%;
+	}
+
+	.tables-container {
+		gap: 20px;
+	}
+
+	.table-wrapper,
+	.income,
+	.outgoing {
+		flex: 1 1 90%;
+		min-width: auto;
+	}
+}

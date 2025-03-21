@@ -84,7 +84,6 @@ public class AdminController extends Controller {
 			Map<String, Object> saved_account_info = this.transaction_manipulator.getBalanceForAccount(account);
 
 			ArrayList<Transaction> transactions = (ArrayList<Transaction>) saved_account_info.get("transactions");
-			account = (Account) saved_account_info.get("account");
 
 			List<Map<String, Object>> in_transactions = new ArrayList<>();
 			List<Map<String, Object>> out_transactions = new ArrayList<>();
@@ -93,27 +92,23 @@ public class AdminController extends Controller {
 			for(int i = transactions.size(); i > 0; i--) {
 				Transaction transaction = transactions.get(i-1);
 
-				if(transaction.getType().equals("PAYMENT") || transaction.getType().equals("WITHDRAWAL")) {
-					out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
-				}
-
-				else if(transaction.getType().equals("DEPOSIT")) {
-					in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
-				}
-
-				else if(transaction.getType().equals("TRANSFER")) {
-					if(transaction.getSender().equals(account.getName())) {
+                switch (transaction.getType()) {
+                    case "PAYMENT", "WITHDRAWAL" -> {
 						out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
 					}
 
-					else {
+                    case "DEPOSIT" -> {
 						in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
 					}
-				}
 
-				else {
-					continue;
-				}
+					case "TRANSFER" -> {
+                        if (transaction.getSender().equals(account.getName())) {
+                            out_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+                        } else {
+                            in_transactions.add(this.transaction_manipulator.createTransactionMap(transaction));
+                        }
+                    }
+                }
 			}
 
 			Map<String, Object> model = new HashMap<>();

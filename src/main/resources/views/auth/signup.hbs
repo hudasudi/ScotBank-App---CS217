@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign Up</title>
+        <link rel="stylesheet" href="../assets/static/css/auth/signup.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Welcome to ScotBank!</h1>
+
+            {{#if signup_error}}
+                <div class="error">
+                    <div class="error-header">{{signup_error}}</div>
+                    <div class="error-message">{{signup_message}}</div>
+                </div>
+            {{/if}}
+
+            <form action="/signup/auth" method="POST">
+                <label for="uname">Username</label>
+                <input type="text" id="uname" name="username" placeholder="Enter Username" required>
+
+                <label for="psw">Password</label>
+                <input type="password" id="psw" name="password" placeholder="Enter Password" required>
+
+                <label for="conpsw">Confirm Password</label>
+                <input type="password" id="conpsw" name="confirm_password" placeholder="Enter Password" required>
+
+                <label for="bank-id">Bank ID</label>
+                <input type="password" id="bank-id" name="uuid" placeholder="Enter Bank ID" required>
+
+                <button type="submit"  class="signup-btn">Sign Up</button>
+            </form>
+
+            <div class="login-option">
+                <h2 class="account">Already have an account?</h2>
+
+                <a href="/"><button class="login">Log In</button></a>
+            </div>
+        </div>
+    </body>
+</html>
