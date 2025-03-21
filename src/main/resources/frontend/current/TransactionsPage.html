@@ -1,63 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions - ScotBank</title>
-    <link rel="stylesheet" href="TransactionsStyle.css">
-</head>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Transactions - ScotBank</title>
+		<link rel="stylesheet" href="TransactionsStyle.css">
+	</head>
 
-<body>
+	<body>
+		<div class = "header">
+			<h1>ScotBank AccountView</h1>
+		</div>
 
-    <h1 class="header">ScotBank AccountView</h1>
+		<nav class="topnav">
+			<a href="DashboardPage.html">Home</a>
+			<a class="active" href="TransactionPage.html">Transactions</a>
+			<a href="SummaryOfSpending.html">Account Summary</a>
+			<a href="Settings.html">Settings</a>
+		</nav>
 
-    <nav class="topnav">
-        <a href="DashboardPage.html">Home</a>
-        <a class="active" href="TransactionPage.html">Transactions</a>
-        <a href="SummaryOfSpending.html">Account Summary</a>
-        <a href="Settings.html">Settings</a>
-    </nav>
+		<section class="trans-overview">
+			<h2>Transactions Overview</h2>
+			<p><strong>In:</strong> £5,700</p>
+			<p><strong>Out:</strong> £123,456</p>
+			<p class="trans-overview-total"><strong>Total:</strong> £4,559.51</p>
+		</section>
 
-    <section class="trans-overview">
-        <h2>Transactions Overview</h2>
-        <p><strong>In:</strong> £5,700</p>
-        <p><strong>Out:</strong> £123,456</p>
-        <p class="trans-overview-total"><strong>Total:</strong> £4,559.51</p>
-    </section>
+		<!-- Transactions Table -->
+		<section class="transactions">
+			<h2>Transactions</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Description</th>
+						<th>Amount (£)</th>
+						<th>Balance (£)</th>
+						<th>View</th>
+					</tr>
+				</thead>
+				
+				<tbody id="table-body">
+					<!-- Example Row -->
+					<!--
+					<tr>
+						<td>2025-03-18</td>
+						<td>Grocery Shopping</td>
+						<td>-£80.00</td>
+						<td>£4,479.51</td>
+						<td><button class="view-btn">View</button></td>
+					</tr>
+					-->
+				</tbody>
+			</table>
+			
+			<p id="load-more-button" onclick="showMoreRows()">Load More</p>
+		</section>
 
-    <!-- Transactions Table -->
-    <section class="table-container">
-        <div class="transactions">
-            <h2>Transactions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Amount (£)</th>
-                        <th>Balance (£)</th>
-                        <th>View</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <!-- Example Row -->
-                    <!--
-                    <tr>
-                        <td>2025-03-18</td>
-                        <td>Grocery Shopping</td>
-                        <td>-£80.00</td>
-                        <td>£4,479.51</td>
-                        <td><button class="view-btn">View</button></td>
-                    </tr>
-                    -->
-                </tbody>
-            </table>
-            <p id="load-more-button" onclick="showMoreRows()">Load More</p>
-        </div>
-    </section>
-
-    <script src="Transactions.js"></script>
-</body>
-
+		<script src="Transactions.js"></script>
+	</body>
 </html>

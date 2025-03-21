@@ -1,105 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - ScotBank</title>
-    <link rel="stylesheet" href="DashboardStyle.css">
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Dashboard - ScotBank</title>
+		<link rel="stylesheet" href="DashboardStyle.css">
+	</head>
+	<body>
+		<div class = "header">
+			<h1>ScotBank AccountView</h1>
+		</div>
 
-<h1 class = "header">ScotBank AccountView</h1>
+		<nav class="topnav">
+			<a class="active" href="DashboardPage.html">Home</a>
+			<a href="TransactionsPage.html">Transactions</a>
+			<a href="SummaryOfSpending.html">Account Summary</a>
+			<a href="Settings.html">Settings</a>
+		</nav>
 
+		<section class="acc-overview">
+			<h2>Account Overview</h2>
+			<p><strong>Account Holder:</strong> Mr ..</p>
+			<p><strong>Account ID:</strong> 123456789</p>
+			<p><strong>Account Type:</strong> Current Account</p>
+			<p><strong>Current Balance:</strong> £5,100.00</p>
+		</section>
 
-<nav class="topnav">
-    <a class="active" href="DashboardPage.html">Home</a>
-    <a href="TransactionsPage.html">Transactions</a>
-    <a href="SummaryOfSpending.html">Account Summary</a>
-    <a href="Settings.html">Settings</a>
-</nav>
-
-
-
-
-<section class="acc-overview">
-  <h2>Account Overview</h2>
-  <p><strong>Account Holder:</strong> Mr ..</p>
-  <p><strong>Account ID:</strong> 123456789</p>
-  <p><strong>Account Type:</strong> Current Account</p>
-  <p><strong>Current Balance:</strong> £5,100.00</p>
-</section>
-
-<!--transactions-table-->
-<section class="tables-container">
- <div class="income">
-  <h2>Income</h2>
-  <table>
-      <thead>
-          <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Amount</th>
-             
-          </tr>
-      </thead>
-      <tbody>
-          <tr>
-              <td>26-02-2025</td>
-              <td>Deposit</td>
-              <td>+ £100.00</td>
-              
-          </tr>
-          <tr>
-              <td>26-02-2025</td>
-              <td>Mr ..</td>
-              <td>+ £500.00</td>
-             
-          </tr>
-		  <tr>
-              <td>24-02-2025</td>
-              <td>Salary</td>
-              <td>+ £1000.00</td>
-             
-          </tr>
-      </tbody>
-  </table>
-  <a href="TransactionsPage.html">View More</a>
-  </div>
- <!--transfers-table-->
-  <div class="outgoing">
-    <h2>Outgoings</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Recipient/Sender</th>
-                <th>Amount</th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>26-02-2025</td>
-                <td>Online Shopping</td>
-                <td>- £100.00</td>
-                
-            </tr>
-            <tr>
-                <td>26-02-2025</td>
-                <td>Mr..</td>
-                <td>- £500.00</td>
-                
-            </tr>
-            <tr>
-                <td>26-02-2025</td>
-                <td>Electric Bill</td>
-                <td>- £500.00</td>
-               
-            </tr>
-        </tbody>
-    </table>
-	<a href="TransactionsPage.html">View More</a>
-    </div>
-</section>
-</body>
+		<section class="tables-container">
+			<!--income-table-->
+			<div class="recentTrans">
+				<h2>Income</h2>
+				
+				<table>
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Description</th>
+							<th>Amount</th>
+						 
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>26-02-2025</td>
+							<td>Deposit</td>
+							<td>+ £100.00</td>
+						  
+						</tr>
+						<tr>
+							<td>26-02-2025</td>
+							<td>Mr ..</td>
+							<td>+ £500.00</td>
+						</tr>
+						<tr>
+							<td>24-02-2025</td>
+							<td>Salary</td>
+							<td>+ £1000.00</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<a href="TransactionsPage.html">View More</a>
+			</div>
+			
+			<!--outgoing-table-->
+			<div class="recentTrans">
+				<h2>Outgoings</h2>
+				
+				<table>
+					<thead>
+					<tr>
+						<th>Date</th>
+						<th>Recipient/Sender</th>
+						<th>Amount</th>
+						
+					</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>26-02-2025</td>
+							<td>Online Shopping</td>
+							<td>- £100.00</td>
+							
+						</tr>
+						<tr>
+							<td>26-02-2025</td>
+							<td>Mr..</td>
+							<td>- £500.00</td>
+							
+						</tr>
+						<tr>
+							<td>26-02-2025</td>
+							<td>Electric Bill</td>
+							<td>- £500.00</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<a href="TransactionsPage.html">View More</a>
+			</div>
+		</section>
+	</body>
 </html>
