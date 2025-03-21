@@ -1,0 +1,66 @@
+body,html{
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #4f7896; /* Same background as dashboard */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+
+.container {
+  width: 350px;
+  margin-top: 50px;
+  padding: 30px;
+  background-color: #ffffff; /* Clean white */
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  
+}
+
+
+h1 {
+  font-size: 28px;
+  color: #104973; /* Dashboard header color */
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 10px 0 5px;
+  font-weight: 500;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.Sigin-btn {
+  background-color: #36709e;
+  color: white;
+  padding: 12px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 6px;
+  font-size: 18px;
+  display: inline-block;
+}
+
+.Sigin-btn:hover {
+  background-color: #2a2929;
+}
+
+
+
