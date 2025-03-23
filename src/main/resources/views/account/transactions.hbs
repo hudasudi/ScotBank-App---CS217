@@ -1,116 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Transactions</title>
-        <link rel="stylesheet" href="../assets/static/css/account/transactions.css">
-    </head>
-    <body>
-        <div class="header">
-            <h1 class="header">Transactions</h1>
-        </div>
 
-        <nav class="navbar">
-            <a href="/account/dashboard">Home</a>
-            <a href="/account/details">Account Details</a>
-            <a class="active" href="/account/transactions">Transaction Details</a>
-            <a href="/account/summary">Account Summary</a>
-        </nav>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - ScotBank</title>
+    <link rel="stylesheet" href="../assets/static/css/account/transactions.css">
+</head>
 
-        <section class="trans-overview">
-            <h2>Transactions Overview</h2>
+<body>
+<div class = "header">
+    <h1>Transaction Details</h1>
+</div>
 
-            <p><b>In: </b>£{{income}}</p>
-            <p><b>Out: </b>£{{outgoings}}</p>
-            <br><br>
+<nav class="navbar">
+    <a href="/account/dashboard">Home</a>
+    <a class="active" href="/account/transactions">Transactions</a>
+    <a href="/account/summary">Account Summary</a>
+    <a href="/account/settings">Settings</a>
+</nav>
 
-            <p class="trans-overview-total"><b>Total: </b>£{{account.bal}}</p>
-        </section>
+<section class="trans-overview">
+    <h2>Transactions Overview</h2>
+    <p><b>In:</b> £{{income}}</p>
+    <p><b>Out:</b> £{{outgoings}}</p>
+    <p class="trans-overview-total"><b>Total:</b> £{{account.bal}}</p>
+</section>
 
-        <section class="table-container">
-            <div class="transactions">
-                <h2>Transactions</h2>
+<!-- Transactions Table -->
+<section class="transactions">
+    <h2>Transactions</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Amount (£)</th>
+            <th>Balance (£)</th>
+            <th>View</th>
+        </tr>
+        </thead>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>To/From</th>
-                            <th>Amount (£)</th>
-                            <th>Balance (£)</th>
-                            <th>Processed</th>
-                            <th>View</th>
-                        </tr>
-                    </thead>
+        <tbody id="table-body"></tbody>
+    </table>
 
-                    <tbody id="table-body"></tbody>
-                </table>
+    <p id="load-more-button" onclick="showMoreRows()">Load More</p>
+</section>
 
-                <p id="load-more-button" onclick="showMoreRows()">Load More</p>
-            </div>
-        </section>
+<script>
+    function capitalize(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
 
-        <script>
-            const transactions = [
-                {{#each transactions}}
-                    [
-                        "{{this.timestamp}}",
-                        "{{this.to-from}}",
-                        "{{this.amount}}",
-                        "{{this.current_balance}}",
-                        "{{this.processed}}"
-                    ]{{#unless @last}},{{/unless}}
-                {{/each}}
-            ];
+    const transactions = [
+        {{#each transactions}}
+            [
+                "{{this.timestamp_date}}",
+                "{{this.to-from}}",
+                "{{this.amount}}",
+                "{{this.current_balance}}",
+                "{{this.timestamp_time}}",
+                capitalize("{{this.type}}"),
+                "{{this.category}}"
+            ]{{#unless @last}},{{/unless}}
+        {{/each}}
+    ];
 
-            let currentIndex = 0; // Tracks how many rows are displayed
-            const rowsPerPage = 25;
+    let currentIndex = 0; // Tracks how many rows are displayed
+    const rowsPerPage = 25;
+    const tableBody = document.getElementById("table-body");
+    const loadMoreBtn = document.getElementById("load-more-button");
 
-            const tableBody = document.getElementById("table-body");
-            const loadMoreBtn = document.getElementById("load-more-button");
+    function showMoreRows() {
+        const nextIndex = Math.min(currentIndex + rowsPerPage, transactions.length);
 
-            function showMoreRows() {
-                const nextIndex = Math.min(currentIndex + rowsPerPage, transactions.length);
+        for (let i = currentIndex; i < nextIndex; i++) {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${transactions[i][0]}</td>
+                        <td>${transactions[i][1]}</td>
+                        <td>${transactions[i][2]}</td>
+                        <td>${transactions[i][3]}</td>
+                        <td><button class="view-btn">See Details</button></td>
+                    `;
+            tableBody.appendChild(row);
 
-                for(let i = currentIndex; i < nextIndex; i++) {
-                    let row = document.createElement("tr");
-                    row.innerHTML = `
-                <td>${transactions[i][0]}</td>
-                <td>${transactions[i][1]}</td>
-                <td>${transactions[i][2]}</td>
-                <td>${transactions[i][3]}</td>
-                <td>${transactions[i][4]}</td>
-                <td><button class="view-btn">See Details</button></td>
-            `;
-                    tableBody.appendChild(row);
-                }
+            // Create a hidden row for details
+            let detailsRow = document.createElement("tr");
+            detailsRow.classList.add("details-row");
+            detailsRow.style.display = "none"; // Initially hidden
+            detailsRow.innerHTML = `
+                        <td colspan="5">
+                            <div class="details-content">
+                                <div class="details-item"><b>Time:</b> ${transactions[i][4]}<br></div>
+                                <div class="details-item"><b>Transaction Type:</b> ${transactions[i][5]}<br></div>
+                                <div class="details-item"><b>Business Category:</b> ${transactions[i][6]}<br></div>
+                            </div>
+                        </td>
+                    `;
+            tableBody.appendChild(detailsRow);
 
-                currentIndex = nextIndex;
-
-                // Hide button when all rows are displayed
-                if (currentIndex >= transactions.length) {
-                    loadMoreBtn.style.display = "none";
-                }
-            }
-
-            // Event delegation: Handle all "View" button clicks
-            // This is temporary, should get changed so you can move to another page to view the individual transaction
-            tableBody.addEventListener("click", function (event) {
-                if (event.target.classList.contains("view-btn")) {
-                    const row = event.target.closest("tr");
-                    const date = row.children[0].textContent;
-                    const description = row.children[1].textContent;
-                    const amount = row.children[2].textContent;
-                    const balance = row.children[3].textContent;
-                    const processed = row.children[4].textContent;
-
-                    alert(`Transaction Details:\n\nDate: ${date}\nTo/From: ${description}\nAmount: ${amount}\nBalance: ${balance}\nProcessed: ${processed}`);
-                }
+            // Attach event listener to toggle details row
+            row.querySelector(".view-btn").addEventListener("click", function () {
+                detailsRow.style.display = detailsRow.style.display === "none" ? "table-row" : "none";
             });
+        }
 
-            // Load initial rows
-            showMoreRows();
-        </script>
-    </body>
+        currentIndex = nextIndex;
+
+        // Hide button when all rows are displayed
+        if (currentIndex >= transactions.length) {
+            loadMoreBtn.style.display = "none";
+        }
+    }
+
+    // Load initial rows
+    showMoreRows();
+</script>
+</body>
 </html>

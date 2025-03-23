@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank.controller_tests.Unit;
 
+import io.jooby.Context;
 import io.jooby.ModelAndView;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class AdminControllerTests {
 
         doReturn(tran_map).when(tran_manip).getBalanceForAccount(any(Account.class));
 
-        ModelAndView<Map<String, Object>> view = control.getDashboard();
+        ModelAndView<Map<String, Object>> view = control.getDashboard(mock(Context.class));
 
         assertNotNull(view);
 
@@ -105,7 +106,7 @@ public class AdminControllerTests {
 
             doReturn(null).when(manipulator).getAccountByUUID(anyString());
 
-            ModelAndView<Map<String, Object>> model_no_uuid = control.getSingleAccount("AA");
+            ModelAndView<Map<String, Object>> model_no_uuid = control.getSingleAccount(mock(Context.class));
             Map<String, Object> no_uuid_map = model_no_uuid.getModel();
 
             assertNotNull(model_no_uuid);
@@ -157,7 +158,7 @@ public class AdminControllerTests {
             doReturn(map).when(tra_manip).getBalanceForAccount(any(Account.class));
 
 
-            ModelAndView<Map<String, Object>> model = control.getSingleAccount("AA");
+            ModelAndView<Map<String, Object>> model = control.getSingleAccount(mock(Context.class));
 
             assertNotNull(model);
 

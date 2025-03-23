@@ -9,6 +9,9 @@ body {
     overflow-x: hidden;
 }
 
+/* Get rid of scrollbar */
+::-webkit-scrollbar { display: none !important; }
+
 p {
     font-family: Roboto, Arial, sans-serif;
 }
@@ -21,19 +24,6 @@ p {
     text-align: center;
     color: #f2f2f2;
     background-color: #104973;
-}
-
-.header a {
-    float: left;
-    color: #f2f2f2;
-    text-decoration: none;
-    margin: 20px 10px;
-    transition: color 0.3s;
-    font-size: 20px;
-}
-
-.header a:hover {
-    color: #a1a1a1;
 }
 
 .header h1 {
@@ -113,34 +103,23 @@ nav.navbar a.active {
     overflow-x: auto;
 }
 
-.income, .outgoing {
+.transactions {
     margin-top: 30px;
     overflow-x: auto;
     border-radius: 12px;
     border: 1px solid black;
     box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
-    width: 45%;
+    width: 60%;
 }
 
-.income{
-    margin-left: 3%;
-    margin-bottom: 2.5%;
-    float: left;
-}
-
-.outgoing{
-    float: right;
-    margin-right: 3%;
-}
-
-.income h2, .outgoing h2 {
+.transactions h2 {
     margin: 0;
     color: white;
     background-color: #104973;
     padding: 10px 10px;
 }
 
-.income a, .outgoing a {
+.transactions a {
     margin: 0;
     color: white;
     background-color: #333;
@@ -150,7 +129,7 @@ nav.navbar a.active {
     display: block;
 }
 
-.income a:hover, .outgoing a:hover {
+.transactions a:hover {
     background-color: #ddd;
     color: black;
 }

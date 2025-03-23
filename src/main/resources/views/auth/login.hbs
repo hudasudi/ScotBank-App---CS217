@@ -17,6 +17,13 @@
             </div>
             {{/if}}
 
+            {{#if success_header}}
+            <div class="success">
+                <div class="success-header">{{success_header}}</div>
+                <div class="success-message">{{success_message}}</div>
+            </div>
+            {{/if}}
+
             <form action="/login/auth" method="POST">
                 <label for="uname">Username</label>
                 <input type="text" id="uname" name="username" placeholder="Enter Username" required>

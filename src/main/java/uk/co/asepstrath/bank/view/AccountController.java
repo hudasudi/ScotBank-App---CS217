@@ -6,7 +6,6 @@ import io.jooby.Session;
 import io.jooby.annotation.GET;
 
 import io.jooby.annotation.Path;
-import io.jooby.annotation.QueryParam;
 
 import io.jooby.exception.MissingValueException;
 import uk.co.asepstrath.bank.Account;
@@ -47,7 +46,11 @@ public class AccountController extends Controller {
 				Account account = this.account_manipulator.getAccountByUUID(uuid);
 
 				if(account == null) {
-					return this.buildErrorPage("Error 404 - Account Not Found", "The account you're looking for was not found");
+					session.put("page_error", "Error 404 - Account Not Found");
+					session.put("page_msg", "The account you're looking for was not found");
+
+					ctx.sendRedirect("/error");
+					return null;
 				}
 
 				Map<String, Object> saved_account_info = this.transaction_manipulator.getBalanceForAccount(account);
@@ -124,29 +127,147 @@ public class AccountController extends Controller {
 
 		catch(Exception e) {
 			log.error("Error whilst building handlebars template", e);
-			return this.buildErrorPage("Error whilst finding your page", "Sorry! something unexpected happened when looking for your page");
+			session.put("page_error", "Error whilst finding your page");
+			session.put("page_msg", "Sorry! something unexpected happened when looking for your page");
+
+			ctx.sendRedirect("/error");
+			return null;
 		}
 	}
 
-	/** Get & populate the handlebars template with information for a single account's details
+	/** Get & populate the handlebars template with information for a single account's transactions
 	 * @param ctx The current context
 	 * @return The model to build & deploy
-	*/
-	@GET("/details")
-	public ModelAndView<Map<String, Object>> getAccountDetails(Context ctx) {
+	 */
+	@GET("/transactions")
+	public ModelAndView<Map<String, Object>> getAccountTransactionDetails(Context ctx) {
 		Session session = ctx.session();
 
 		try {
 			if(session.get("logged_in").booleanValue()) {
 				String uuid = session.get("uuid").toString();
 
-				return this.buildErrorPage("PAGE UNDER CONSTRUCTION", "The Frontend design for this page is not yet complete");
+				Account account = this.account_manipulator.getAccountByUUID(uuid);
+
+				if(account == null) {
+					session.put("page_error", "Error 404 - Account Not Found");
+					session.put("page_msg", "Account with UUID '" + uuid + "' not found");
+
+					ctx.sendRedirect("/error");
+					return null;
+				}
+
+				ArrayList<Transaction> transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
+
+				List<Map<String, Object>> transaction_list = new ArrayList<>();
+
+				BigDecimal income = BigDecimal.valueOf(0);
+				BigDecimal outgoings = BigDecimal.valueOf(0);
+
+				for(Transaction transaction : transactions) {
+					Map<String, Object> transaction_map = new HashMap<>();
+
+					transaction_map.put("timestamp_date", transaction.getTimestamp().split(" ")[0]);
+					transaction_map.put("timestamp_time", transaction.getTimestamp().split(" ")[1]);
+
+					Business business = this.business_manipulator.getBusiness(transaction.getRecipient());
+
+					if(business == null) {
+						if(transaction.getType().equals("WITHDRAWAL")) transaction_map.put("category", "Withdrawal");
+						else if(transaction.getType().equals("DEPOSIT")) transaction_map.put("category", "Deposit");
+						else transaction_map.put("category", "Personal Payment");
+					}
+
+					else {
+						transaction_map.put("category", business.getCategory());
+					}
+
+					switch(transaction.getType()) {
+						case "PAYMENT" -> {
+							if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+								account.withdraw(transaction.getAmount(), true);
+								transaction.setProcessed(true);
+
+								outgoings = outgoings.add(transaction.getAmount());
+							}
+
+							transaction_map.put("amount", "-" + transaction.getAmount().toString());
+						}
+
+						case "WITHDRAWAL" -> {
+							if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
+								account.withdraw(transaction.getAmount(), false);
+								transaction.setProcessed(true);
+
+								outgoings = outgoings.add(transaction.getAmount());
+							}
+
+							transaction_map.put("amount", "-" + transaction.getAmount().toString());
+						}
+
+						case "DEPOSIT" -> {
+							if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+								account.deposit(transaction.getAmount());
+								transaction.setProcessed(true);
+
+								income = income.add(transaction.getAmount());
+							}
+
+							transaction_map.put("amount", "+" + transaction.getAmount().toString());
+						}
+
+						case "TRANSFER" -> {
+							// We're sending money out
+							if(transaction.getSender().equals(uuid)) {
+								if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+									if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
+										account.withdraw(transaction.getAmount(), false);
+										transaction.setProcessed(true);
+
+										outgoings = outgoings.add(transaction.getAmount());
+									}
+								}
+
+								transaction_map.put("amount", "-" + transaction.getAmount().toString());
+							}
+
+							// We're getting money in
+							else {
+								if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+									account.deposit(transaction.getAmount());
+									transaction.setProcessed(true);
+
+									income = income.add(transaction.getAmount());
+								}
+
+								transaction_map.put("amount", "+" + transaction.getAmount().toString());
+							}
+						}
+
+						// We don't know the transaction type
+						default -> log.error("Unknown Transaction Type: {}", transaction);
+					}
+
+					transaction_map.put("to-from", transaction.getRecipient() == null ? "Withdrawal" : transaction.getRecipient());
+					transaction_map.put("current_balance", account.getBalance());
+					transaction_map.put("type", transaction.getType().toLowerCase());
+
+					transaction_list.add(transaction_map);
+				}
+
+				Map<String, Object> model = new HashMap<>();
+
+				model.put("transactions", transaction_list);
+				model.put("income", income);
+				model.put("outgoings", outgoings);
+				model.put("account", this.account_manipulator.createAccountMap(account));
+
+				return new ModelAndView<>("account/transactions.hbs", model);
 			}
 
 			else {
 				throw new MissingValueException("Not logged in");
 			}
-
 		}
 
 		catch(MissingValueException e) {
@@ -159,6 +280,11 @@ public class AccountController extends Controller {
 
 		catch(Exception e) {
 			log.error("Error whilst building handlebars template", e);
+
+			session.put("page_error", "Error whilst finding your page");
+			session.put("page_msg", "Sorry! something unexpected happened whilst looking for your page");
+
+			ctx.sendRedirect("/error");
 			return null;
 		}
 	}
@@ -178,7 +304,11 @@ public class AccountController extends Controller {
 				Account account = this.account_manipulator.getAccountByUUID(uuid);
 
 				if(account == null) {
-					return this.buildErrorPage("Error 404 - Account Not Found", "Account with UUID " + uuid + " not found");
+					session.put("page_error", "Error 404 - Account Not Found");
+					session.put("page_msg", "Account with UUID '" + uuid + "' not found");
+
+					ctx.sendRedirect("/error");
+					return null;
 				}
 
 				HashMap<String, BigDecimal> out = new HashMap<>();
@@ -209,15 +339,8 @@ public class AccountController extends Controller {
 					}
 				}
 
-				Iterator<String> out_iterator = out.keySet().iterator();
-
-				while(out_iterator.hasNext()) {
-					String key = out_iterator.next();
-
-					if(out.get(key).compareTo(BigDecimal.ZERO) == 0) {
-						out_iterator.remove();
-					}
-				}
+				// Remove all categories with a spending total of 0 (they are irrelevant)
+                out.keySet().removeIf(key -> out.get(key).compareTo(BigDecimal.ZERO) == 0);
 
 				List<Map.Entry<String, BigDecimal>> category_list = new ArrayList<>(out.entrySet());
 
@@ -244,122 +367,25 @@ public class AccountController extends Controller {
 
 		catch(Exception e) {
 			log.error("Error whilst building handlebars template", e);
-			return this.buildErrorPage("Error whilst finding your page", "Sorry! something unexpected happened when looking for your page");
+			session.put("page_error", "Error whilst finding your page");
+			session.put("page_msg", "Sorry! something unexpected happened when looking for your page");
+
+			ctx.sendRedirect("/error");
+			return null;
 		}
 	}
 
-	/** Get & populate the handlebars template with information for a single account's transactions
+	/** Get & populate the handlebars template with information for a single account's settings
 	 * @param ctx The current context
 	 * @return The model to build & deploy
 	*/
-	@GET("/transactions")
-	public ModelAndView<Map<String, Object>> getAccountTransactionDetails(Context ctx) {
+	@GET("/settings")
+	public ModelAndView<Map<String, Object>> getAccountSettings(Context ctx) {
 		Session session = ctx.session();
 
 		try {
 			if(session.get("logged_in").booleanValue()) {
-				String uuid = session.get("uuid").toString();
-
-				Account account = this.account_manipulator.getAccountByUUID(uuid);
-
-				if(account == null) {
-					return this.buildErrorPage("Error 404 - Account Not Found", "Account with UUID " + uuid + " not found");
-				}
-
-				ArrayList<Transaction> transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
-
-				List<Map<String, Object>> transaction_list = new ArrayList<>();
-
-				BigDecimal income = BigDecimal.valueOf(0);
-				BigDecimal outgoings = BigDecimal.valueOf(0);
-
-				for(Transaction transaction : transactions) {
-					Map<String, Object> transaction_map = new HashMap<>();
-
-					transaction_map.put("timestamp", transaction.getTimestamp());
-
-					if(transaction.getType().equals("PAYMENT")) {
-						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-							account.withdraw(transaction.getAmount(), true);
-
-							transaction.setProcessed(true);
-
-							outgoings = outgoings.add(transaction.getAmount());
-						}
-
-						transaction_map.put("amount", "-" + transaction.getAmount().toString());
-					}
-
-					else if(transaction.getType().equals("WITHDRAWAL")) {
-						if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
-							account.withdraw(transaction.getAmount(), false);
-							transaction.setProcessed(true);
-
-							outgoings = outgoings.add(transaction.getAmount());
-						}
-
-						transaction_map.put("amount", "-" + transaction.getAmount().toString());
-					}
-
-					else if(transaction.getType().equals("DEPOSIT")) {
-						if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-							account.deposit(transaction.getAmount());
-							transaction.setProcessed(true);
-
-							income = income.add(transaction.getAmount());
-						}
-
-						transaction_map.put("amount", "+" + transaction.getAmount().toString());
-					}
-
-					else if(transaction.getType().equals("TRANSFER")) {
-						// We're sending money out
-						if(transaction.getSender().equals(uuid)) {
-							if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-								if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
-									account.withdraw(transaction.getAmount(), false);
-									transaction.setProcessed(true);
-
-									outgoings = outgoings.add(transaction.getAmount());
-								}
-							}
-
-							transaction_map.put("amount", "-" + transaction.getAmount().toString());
-						}
-
-						// We're getting money in
-						else {
-							if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-								account.deposit(transaction.getAmount());
-								transaction.setProcessed(true);
-
-								income = income.add(transaction.getAmount());
-							}
-
-							transaction_map.put("amount", "+" + transaction.getAmount().toString());
-						}
-					}
-
-					// We don't know the transaction type
-					else {
-						System.out.println(transaction);
-					}
-
-					transaction_map.put("to-from", transaction.getRecipient());
-					transaction_map.put("current_balance", account.getBalance());
-					transaction_map.put("processed", transaction.isProcessed() ? "PROCESSED" : "DECLINED");
-
-					transaction_list.add(transaction_map);
-				}
-
-				Map<String, Object> model = new HashMap<>();
-
-				model.put("transactions", transaction_list);
-				model.put("income", income);
-				model.put("outgoings", outgoings);
-				model.put("account", this.account_manipulator.createAccountMap(account));
-
-				return new ModelAndView<>("account/transactions.hbs", model);
+				return new ModelAndView<>("account/settings.hbs", new HashMap<>());
 			}
 
 			else {
@@ -377,7 +403,9 @@ public class AccountController extends Controller {
 
 		catch(Exception e) {
 			log.error("Error whilst building handlebars template", e);
-			return this.buildErrorPage("Error whilst finding your page", "Sorry! something unexpected happened when looking for your page");
+			session.put("login_redirect", 1);
+			ctx.sendRedirect("/");
+			return null;
 		}
 	}
 }

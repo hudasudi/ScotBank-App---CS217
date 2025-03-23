@@ -1,7 +1,10 @@
 package uk.co.asepstrath.bank.view;
 
+import io.jooby.Context;
 import io.jooby.ModelAndView;
+import io.jooby.Session;
 import io.jooby.annotation.Path;
+import io.jooby.exception.MissingValueException;
 import org.slf4j.Logger;
 
 import uk.co.asepstrath.bank.api.manipulators.AccountAPIManipulator;
@@ -43,12 +46,41 @@ public abstract class Controller {
         this.transaction_manipulator = manipulator;
     }
 
-    protected ModelAndView<Map<String, Object>> buildErrorPage(String error, String msg) {
-        Map<String, Object> map = new HashMap<>();
+    protected ModelAndView<Map<String, Object>> buildErrorPage(Context ctx) {
+        Session session = ctx.session();
 
-        map.put("err", error);
-        map.put("msg", msg);
+        try {
+            String error = session.get("page_error").toString();
+            String msg = session.get("page_msg").toString();
 
-        return new ModelAndView<>("error.hbs", map);
+            // If there is a valid error
+            if(!error.equals("<missing>") && !msg.equals("<missing>")) {
+                Map<String, Object> map = new HashMap<>();
+
+                map.put("err", error);
+                map.put("msg", msg);
+
+                // Reset error info
+                session.remove("page_error");
+                session.remove("page_msg");
+
+                return new ModelAndView<>("error.hbs", map);
+            }
+
+            // There is no error
+            else {
+                session.put("login_redirect", 4);
+
+                ctx.sendRedirect("/");
+                return null;
+            }
+        }
+
+        // No error message
+        catch(MissingValueException e) {
+            session.put("login_redirect", 4);
+            ctx.sendRedirect("/");
+            return null;
+        }
     }
 }

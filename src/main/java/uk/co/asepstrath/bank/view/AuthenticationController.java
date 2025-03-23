@@ -42,6 +42,19 @@ public class AuthenticationController extends Controller {
         Map<String, Object> model = new HashMap<>();
 
         try {
+            if (session.get("signup_success").booleanValue()) {
+                model.put("success_header", "Success!");
+                model.put("success_message", "You have successfully signed up!");
+
+                session.remove("signup_success");
+
+                return new ModelAndView<>("auth/login.hbs", model);
+            }
+        }
+
+        catch (MissingValueException ignored) {}
+
+        try {
             // If you're already logged in, redirect back to dashboard
             if(session.get("logged_in").booleanValue()) {
                 ctx.sendRedirect("/account/dashboard");
@@ -55,6 +68,9 @@ public class AuthenticationController extends Controller {
             if(error_message != null) {
                 model.put("login_error", "There was an error whilst logging in");
                 model.put("login_message", error_message);
+
+                // Reset redirect
+                session.remove("login_redirect");
 
                 return new ModelAndView<>("auth/login.hbs", model);
             }
@@ -110,13 +126,14 @@ public class AuthenticationController extends Controller {
         // We don't have sha-256 somehow :(
         catch(NoSuchAlgorithmException e) {
             log.error("Somehow the hashing algorithm was not found");
+            session.put("login_redirect", 1);
         }
 
         // If we fall out of either catches, redirect back to the login page
         ctx.sendRedirect("/");
     }
 
-    @POST("/login/logout")
+    @POST("/logout")
     public void logout(Context ctx) {
         Session session = ctx.session();
 
@@ -142,6 +159,7 @@ public class AuthenticationController extends Controller {
 
             // Normal uuid
             else {
+                session.put("is_admin", false);
                 ctx.sendRedirect("/account/dashboard");
             }
         }
@@ -188,6 +206,8 @@ public class AuthenticationController extends Controller {
             if(error_message != null) {
                 model.put("signup_error", "There was an error whilst signing up");
                 model.put("signup_message", error_message);
+
+                session.remove("signup_redirect");
 
                 return new ModelAndView<>("auth/signup.hbs", model);
             }
@@ -247,6 +267,8 @@ public class AuthenticationController extends Controller {
 
                 insert_user.executeUpdate();
 
+                session.put("signup_success", true);
+
                 ctx.sendRedirect("/");
                 return;
             }
@@ -263,6 +285,15 @@ public class AuthenticationController extends Controller {
         // If something goes wrong, send a generic error message
         session.put("signup_redirect", 5);
         ctx.sendRedirect("/signup");
+    }
+
+    /** Deploy the error page to the endpoint
+     * @param ctx The current context
+     * @return The model to build & deploy
+     */
+    @GET("/error")
+    public ModelAndView<Map<String, Object>> deployErrorPage(Context ctx) {
+        return this.buildErrorPage(ctx);
     }
 
     /** Check whether a specific username already exists inside the Users table
@@ -311,12 +342,16 @@ public class AuthenticationController extends Controller {
         return set.next();
     }
 
-    // TODO: WRITE COMMENT
+    /** Return a specific login error message depending on the redirect code
+     * @param redirect_code The code for the error
+     * @return An error message for the user
+    */
     private String getLoginErrorMessage(int redirect_code) {
         return switch (redirect_code) {
             case 1 -> "Please try again in a few minutes";
             case 2 -> "You need to log in first!";
             case 3 -> "Invalid username/password!";
+            case 4 -> "You can't access that page!";
             default -> null;
         };
     }

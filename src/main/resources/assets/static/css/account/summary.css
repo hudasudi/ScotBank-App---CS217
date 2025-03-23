@@ -1,12 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
-body {
-    align-items: center;
-    justify-content: center;
-    background-color: #4f7896;
-    font-family: Arial, sans-serif;
+/* Set all to have zero margins & padding */
+* {
     margin: 0;
-    overflow-x: hidden;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #4f7896;
+    color: #333;
 }
 
 p {
@@ -16,41 +27,22 @@ p {
 /* Page Header */
 .header {
     width: 100%;
-    margin: 0;
-    overflow: hidden;
     text-align: center;
     color: #f2f2f2;
     background-color: #104973;
-}
-
-.header a {
-    float: left;
-    color: #f2f2f2;
-    text-decoration: none;
-    margin: 20px 10px;
-    transition: color 0.3s;
+    padding: 20px 10px;
     font-size: 20px;
 }
 
-.header a:hover {
-    color: #a1a1a1;
-}
-
-.header h1 {
-    font-size: 40px;
-    padding: 20px 10px;
-}
-
 /* Navigation */
-
 nav.navbar {
     width: 100%;
     background-color: #333;
-    overflow: hidden;
-    top: 0;
-    left: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    border: 2px solid #222;
+    border-right: 0;
+    margin-bottom: 30px;
 }
 
 nav.navbar a {
@@ -59,45 +51,39 @@ nav.navbar a {
     text-align: center;
     padding: 14px 0;
     text-decoration: none;
-    font-size: 16px;
-    transition: background 0.3s;
+    font-size: 17px;
+    border-right: 2px solid #222;
 }
 
 nav.navbar a:hover {
     background-color: #ddd;
-    color: black;
+    color: #333;
 }
 
 nav.navbar a.active {
-    background-color: #36709e;
+    background-color: #538bb8;
     color: white;
 }
 
-/* Main Content */
-
+/* Spending Overview Table Container */
 .spending {
+    margin-top: 30px;
     overflow-x: auto;
     border-radius: 12px;
     border: 1px solid black;
     box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
     width: 60%;
-    margin: 30px auto 2.5%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2.5%;
 }
 
 .spending h2 {
     margin: 0;
-    color: white;
     background-color: #104973;
-    padding: 10px 10px;
-}
-
-.spending p {
-    margin: 0;
     color: white;
-    background-color: #333;
-    text-align: center;
-    padding: 10px 10px;
-    display: block;
+    padding: 15px 20px;
+    font-size: 22px;
 }
 
 .spending p:hover {
@@ -105,8 +91,7 @@ nav.navbar a.active {
     color: black;
 }
 
-/* Table Layout */
-
+/* Tables */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -117,6 +102,7 @@ th, td {
     padding: 14px;
     border: 1px solid #ddd;
     text-align: center;
+    font-size: 16px;
 }
 
 tr:nth-child(even) {
@@ -127,9 +113,37 @@ tr:hover {
     background-color: #d3d3d3;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     .spending-overview {
+        width: 95%;
+    }
+    .spending{
+        width: 95%;
+    }
+}
+
+/* Optional for Top Navigation - Uncomment if needed */
+
+@media (max-width: 768px) {
+    .navbar {
         flex-direction: column;
         align-items: center;
+    }
+
+    .navbar a {
+        flex: none;
+        width: 100%;
+        padding: 12px 0;
+        font-size: 18px;
+        border-bottom: 1px solid #555;
+    }
+
+    .navbar a:last-child {
+        border-bottom: none;
+    }
+
+    .header {
+        padding: 10px 20px;
+        font-size: 28px;
     }
 }

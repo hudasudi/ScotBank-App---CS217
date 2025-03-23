@@ -1,56 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-
-body {
-    align-items: center;
-    justify-content: center;
-    background-color: #4f7896;
-    font-family: Arial, sans-serif;
+/* Set all to have zero margins & padding */
+* {
     margin: 0;
-    overflow-x: hidden;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-p {
-    font-family: Roboto, Arial, sans-serif;
+/* Get rid of scrollbar */
+::-webkit-scrollbar { display: none !important; }
+
+/* Body */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #4f7896;
+    color: #333;
 }
 
 /* Page Header */
 .header {
     width: 100%;
-    margin: 0;
-    overflow: hidden;
     text-align: center;
     color: #f2f2f2;
     background-color: #104973;
-}
-
-.header a {
-    float: left;
-    color: #f2f2f2;
-    text-decoration: none;
-    margin: 20px 10px;
-    transition: color 0.3s;
+    padding: 20px 10px;
     font-size: 20px;
 }
 
-.header a:hover {
-    color: #a1a1a1;
-}
-
-.header h1 {
-    font-size: 40px;
-    padding: 20px 10px;
-}
-
 /* Navigation */
-
 nav.navbar {
     width: 100%;
     background-color: #333;
-    overflow: hidden;
-    top: 0;
-    left: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    border: 2px solid #222;
+    border-right: 0;
 }
 
 nav.navbar a {
@@ -59,114 +47,50 @@ nav.navbar a {
     text-align: center;
     padding: 14px 0;
     text-decoration: none;
-    font-size: 16px;
-    transition: background 0.3s;
+    font-size: 17px;
+    border-right: 2px solid #222;
 }
 
 nav.navbar a:hover {
     background-color: #ddd;
-    color: black;
+    color: #333;
 }
 
 nav.navbar a.active {
-    background-color: #36709e;
+    background-color: #538bb8;
     color: white;
 }
 
-/* Account Overview */
+/* Transactions Overview */
 .trans-overview {
-    font-size: 19px;
-    border-radius: 12px;
     background-color: #ffffff;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 30px;
-    width: 55%;
-    padding-right: 2%;
-    padding-left: 1%;
-    border: 1px solid black;
-    box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
-    text-align: center;
-    padding-top: 0;
-    padding-bottom: 15px;
-}
-
-.trans-overview h2{
-    text-align: center;
-}
-
-.trans-overview p{
-    margin-left: 5%;
-    padding: auto;
-    text-align: center;
-    margin-top: 0;
-    padding-top: 0;
-    display: inline;
-}
-
-.trans-overview-total{
-}
-
-/* Tables Layout */
-.tables-container {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-    width: 90%;
-    flex-wrap: wrap;
-}
-
-.tables-container h2 {
-    color: #f2f2f2;
-}
-
-.table-wrapper {
-    flex: 1;
-    margin: 10px;
-    min-width: 400px;
-}
-
-.transactions {
-    margin-top: 30px;
-    overflow-x: auto;
+    width: 50%;
+    margin: 30px auto;
+    padding: 20px;
     border-radius: 12px;
-    border: 1px solid black;
-    box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
-}
-
-.transactions  {
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 2.5%;
-}
-
-.transactions h2 {
-    margin: 0;
-    color: white;
-    background-color: #104973;
-    padding-left: 20px;
-    padding: 10px 10px;
-    margin-bottom: 0;
-}
-
-.transactions p {
-    margin: 0;
-    color: white;
-    background-color: #333;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
-    padding: 10px 10px;
-    margin-bottom: 0;
-    display: block;
+    font-size: 19px;
 }
 
-.transactions p:hover {
-    background-color: #ddd;
-    color: black;
+.trans-overview h2 {
+    margin-bottom: 10px;
+    color: #104973;
 }
 
+.trans-overview p {
+    margin: 8px 0;
+    font-size: 18px;
+}
 
+.trans-overview-total {
+    margin-top: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #36709e;
+}
 
+/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -177,6 +101,12 @@ th, td {
     padding: 14px;
     border: 1px solid #ddd;
     text-align: center;
+    font-size: 16px;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #333;
 }
 
 tr:nth-child(even) {
@@ -187,28 +117,71 @@ tr:hover {
     background-color: #d3d3d3;
 }
 
+/* Transactions Table Container */
+.transactions {
+    margin-top: 10px;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid black;
+    box-shadow: 0 4px 8px rgba(108, 122, 184, 0.2);
+    width: 70%;             /* Responsive! Adjusts based on screen width */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2.5%;
+}
+
+.transactions h2 {
+    margin: 0;
+    background-color: #104973;
+    color: white;
+    padding: 15px 20px;
+    font-size: 22px;
+}
+
+.transactions p#load-more-button {
+    margin: 0;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+.transactions p#load-more-button:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
 /* View Button */
 .view-btn {
     background-color: #36709e;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 5px;
     cursor: pointer;
+    transition: background 0.3s;
 }
 
 .view-btn:hover {
     background-color: #2a2929;
 }
 
-/* Responsive Design */
-@media (max-width: 900px) {
-    .tables-container {
-        flex-direction: column;
-        align-items: center;
-    }
+/* Details Content */
+.details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+}
 
-    .table-wrapper {
+/* Responsive Design */
+@media (max-width: 600px) {
+    .trans-overview{
         width: 90%;
+    }
+    .transactions {
+        width: 95%;
     }
 }

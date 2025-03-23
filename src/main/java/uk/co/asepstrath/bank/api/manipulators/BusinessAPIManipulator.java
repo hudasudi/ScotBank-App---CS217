@@ -96,4 +96,22 @@ public class BusinessAPIManipulator extends APIManipulator {
 
 		return businesses;
 	}
+
+	/** Get a specific business from its name
+	 * @param name The businesses name
+	 * @return A business object if the name matches, otherwise null
+	*/
+	public Business getBusiness(String name) {
+		Business business = null;
+
+		if(name == null) return null;
+
+		for(Business b : this.jsonToBusinesses()) {
+			if(b.getName().equals(name)) {
+				business = b;
+			}
+		}
+
+		return business;
+	}
 }

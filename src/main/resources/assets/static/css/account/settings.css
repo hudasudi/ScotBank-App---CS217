@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Set all to have zero margins & padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #4f7896;
+    color: #333;
+}
+
+p {
+    font-family: Roboto, Arial, sans-serif;
+}
+
+/* Page Header */
+.header {
+    width: 100%;
+    text-align: center;
+    color: #f2f2f2;
+    background-color: #104973;
+    padding: 20px 10px;
+    font-size: 20px;
+}
+
+/* Navigation */
+nav.navbar {
+    width: 100%;
+    background-color: #333;
+    display: flex;
+    justify-content: space-around;
+    border: 2px solid #222;
+    border-right: 0;
+}
+
+nav.navbar a {
+    flex: 1;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 0;
+    text-decoration: none;
+    font-size: 17px;
+    border-right: 2px solid #222;
+}
+
+nav.navbar a:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
+nav.navbar a.active {
+    background-color: #538bb8;
+    color: white;
+}
+
+/* Log Out Box */
+.log-out{
+    width: 390px;
+    margin-top: 50px;
+    padding: 30px;
+    background-color: #ffffff; /* Clean white */
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.log-out h2{
+    margin-bottom: 10px;
+    color: #104973;
+    font-size: 28px;
+}
+
+.log-out-btn{
+    background-color: #36709e;
+    color: white;
+    padding: 12px 0;
+    border: none;
+    cursor: pointer;
+    margin-top: 22px;
+    width: 85%;
+    border-radius: 6px;
+    font-size: 18px;
+    display: inline-block;
+}
+
+.log-out-btn:hover {
+    background-color: #2a2929;
+}

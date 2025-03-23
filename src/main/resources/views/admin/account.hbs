@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Details</title>
+        <link rel="stylesheet" href="../assets/static/css/admin/account.css">
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>Admin View Account</h1>
+        </div>
+
+        <nav class="navbar">
+            <a href="/admin/dashboard">Home</a>
+            <a href="/admin/business-report">Business Report</a>
+            <a href="/admin/big-spenders">Big Spenders</a>
+        </nav>
+
+        <section class="overview">
+            <h2>Account Overview</h2>
+
+            <p><b>Account Holder: </b>{{account.name}}</p>
+            <p><b>Account ID: </b>{{account.uuid}}</p>
+            <p><b>Current Balance: </b>£{{account.bal}}</p>
+        </section>
+
+        <section class="table-container">
+            <div class="transactions">
+                <h2>Transactions</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount (£)</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {{#each transactions}}
+                        <tr>
+                            <td>{{timestamp_date}}</td>
+                            <td>{{to-from}}</td>
+                            <td>{{amount}}</td>
+                            <td>{{timestamp_time}}</td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </body>
+</html>

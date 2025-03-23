@@ -114,7 +114,7 @@ public class TransactionAPIManipulator extends APIManipulator {
 
 		Map<String, Object> map = new HashMap<>();
 
-		map.put("timestamp", transaction.getTimestamp());
+		map.put("timestamp", transaction.getTimestamp().split(" ")[0]);
 		map.put("amount", transaction.getAmount());
 		map.put("sender", transaction.getSender() == null ? "Branch Deposit" : transaction.getSender());
 		map.put("id", transaction.getID());

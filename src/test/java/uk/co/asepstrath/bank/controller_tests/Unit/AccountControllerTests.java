@@ -163,7 +163,7 @@ public class AccountControllerTests {
             AccountController control = new AccountController(mock(Logger.class), mockDataSource);
 
             // Check for null uuid
-            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccountDetails(null);
+            ModelAndView<Map<String, Object>> model_no_uuid = control.getAccountSettings(null);
             Map<String, Object> no_uuid_map = model_no_uuid.getModel();
 
             assertNotNull(model_no_uuid);
@@ -183,7 +183,7 @@ public class AccountControllerTests {
 
             AccountController control = new AccountController(mock(Logger.class), mockDataSource);
 
-            ModelAndView<Map<String, Object>> model_uuid = control.getAccountDetails(mock(Context.class));
+            ModelAndView<Map<String, Object>> model_uuid = control.getAccountSettings(mock(Context.class));
             Map<String, Object> uuid_map = model_uuid.getModel();
 
             assertNotNull(model_uuid);

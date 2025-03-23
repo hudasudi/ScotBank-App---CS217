@@ -3,43 +3,40 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Account Details</title>
+        <title>Summary Of Spending - ScotBank</title>
         <link rel="stylesheet" href="../assets/static/css/account/summary.css">
     </head>
-    <body>
+    <body class="summary-page">
         <div class="header">
-            <h1>Account Spending</h1>
+            <h1>Account Summary</h1>
         </div>
 
         <nav class="navbar">
             <a href="/account/dashboard">Home</a>
-            <a href="/account/details">Account Details</a>
-            <a href="/account/transactions">Transaction Details</a>
+            <a href="/account/transactions">Transactions</a>
             <a class="active" href="/account/summary">Account Summary</a>
+            <a href="/account/settings">Settings</a>
         </nav>
 
-        <section class="table-container">
-            <div class="spending">
-                <h2>Summary of Spending</h2>
+        <section class="spending">
+            <h2>Summary of Spending</h2>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Amount Spent (£)</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {{#each categories}}
-                            <tr>
-                                <td>{{this.key}}</td>
-                                <td>{{this.value}}</td>
-                            </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount Spent(£)</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {{#each categories}}
+                    <tr>
+                        <td>{{this.key}}</td>
+                        <td>{{this.value}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </section>
     </body>
 </html>

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard</title>
 
-        <link rel="stylesheet" href="../assets/static/css/admin/admin_dashboard.css">
+        <link rel="stylesheet" href="../assets/static/css/admin/dashboard.css">
     </head>
     <body>
         <h1 class="header">Account List View</h1>
@@ -53,6 +53,30 @@
         </main>
 
         <script>
+
+            // For going to specific accounts
+            function postToEndpoint() {
+                const buttons = document.querySelectorAll(".view-btn");
+
+                buttons.forEach(button => {
+                    button.addEventListener("click", function() {
+                        const data_to_send = button.getAttribute("data-value");
+
+                        fetch('find/users', {
+                            method: 'POST',
+                            body: data_to_send,
+                        })
+                        .then(() => {
+                            // Redirect
+                            window.location.replace('/admin/account');
+                        })
+                        .catch((error) => {
+                            console.error('Error: ', error);
+                        });
+                    });
+                });
+            }
+
             // Search bar
             function searchTable() {
                 let input, filter, table, tr, td, i, txt_value;
@@ -81,7 +105,7 @@
             }
 
             // Paginated Table
-            const data = [
+            const table_data = [
                 {{#each accounts}}
                     {
                         "uuid": "{{uuid}}",
@@ -98,7 +122,7 @@
                 const table_body = document.getElementById("table-body");
                 const start = (page - 1) * rows_per_page;
                 const end = start + rows_per_page;
-                const sliced_data = data.slice(start, end);
+                const sliced_data = table_data.slice(start, end);
 
                 table_body.innerHTML = ``;
 
@@ -112,14 +136,14 @@
                     uuid.innerHTML = item.uuid;
                     name.innerHTML = item.name;
                     balance.innerHTML = "£" + item.balance;
-                    action.innerHTML = `<button class="view-btn" onclick="location.href='/admin/account?uuid=`+item.uuid+`'">View</button>`;
+                    action.innerHTML = `<button class="view-btn" data-value='`+ item.uuid +`'>View Details</button>`;
                 });
 
                 updatePagination(page);
             }
 
             function updatePagination(current_page) {
-                const page_count = Math.ceil(data.length / rows_per_page);
+                const page_count = Math.ceil(table_data.length / rows_per_page);
                 const pagination_container = document.querySelector(".pagination");
 
                 pagination_container.innerHTML = "";
@@ -144,6 +168,7 @@
 
             // Initial display
             displayTable(current_page);
+            postToEndpoint();
         </script>
     </body>
 </html>
