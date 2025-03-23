@@ -63,7 +63,7 @@ public class AccountControllerTests {
         // Check HTTP Response
 
         Request req = new Request.Builder()
-            .url("http://localhost:"+serverPort+"/accounts/account?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da")
+            .url("http://localhost:"+serverPort+"/account/dashboard")
             .build();
 
         try(Response rsp = client.newCall(req).execute()) {
@@ -80,7 +80,7 @@ public class AccountControllerTests {
         // Check HTTP Response
 
         Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/details?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da")
+                .url("http://localhost:"+serverPort+"/account/summary")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
@@ -142,7 +142,7 @@ public class AccountControllerTests {
         // Check HTTP Response
 
         Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/account?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da")
+                .url("http://localhost:"+serverPort+"/account/dashboard")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
@@ -190,7 +190,7 @@ public class AccountControllerTests {
         // Check HTTP Response
 
         Request req = new Request.Builder()
-                .url("http://localhost:"+serverPort+"/accounts/account?uuid=04f6ab33-8208-4234-aabd-b6a8be8493da")
+                .url("http://localhost:"+serverPort+"/account/dashboard")
                 .build();
 
         try(Response rsp = client.newCall(req).execute()) {
