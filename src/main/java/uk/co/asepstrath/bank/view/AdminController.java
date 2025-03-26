@@ -240,4 +240,38 @@ public class AdminController extends Controller {
 			ctx.sendRedirect("/error");
 		}
 	}
+
+	/** Get & populate the handlebars template with information for a single account's settings
+	 * @param ctx The current context
+	 * @return The model to build & deploy
+	 */
+	@GET("/settings")
+	public ModelAndView<Map<String, Object>> getAccountSettings(Context ctx) {
+		Session session = ctx.session();
+
+		try {
+			if(session.get("logged_in").booleanValue()) {
+				return new ModelAndView<>("admin/settings.hbs", new HashMap<>());
+			}
+
+			else {
+				throw new MissingValueException("Not logged in");
+			}
+		}
+
+		catch(MissingValueException e) {
+			session.put("login_redirect", 2);
+			session.put("logged_in", false);
+
+			ctx.sendRedirect("/");
+			return null;
+		}
+
+		catch(Exception e) {
+			log.error("Error whilst building handlebars template", e);
+			session.put("login_redirect", 1);
+			ctx.sendRedirect("/");
+			return null;
+		}
+	}
 }
