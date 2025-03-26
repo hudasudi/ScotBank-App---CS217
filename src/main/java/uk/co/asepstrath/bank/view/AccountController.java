@@ -140,6 +140,7 @@ public class AccountController extends Controller {
 	 * @return The model to build & deploy
 	 */
 	@GET("/transactions")
+	@SuppressWarnings("unchecked")
 	public ModelAndView<Map<String, Object>> getAccountTransactionDetails(Context ctx) {
 		Session session = ctx.session();
 
@@ -157,14 +158,19 @@ public class AccountController extends Controller {
 					return null;
 				}
 
-				ArrayList<Transaction> transactions = this.transaction_manipulator.getTransactionForAccount(uuid);
+				Map<String, Object> transaction_mappings = this.transaction_manipulator.getBalanceForAccount(account);
+
+
+				account = (Account) transaction_mappings.get("account");
+
+				ArrayList<Transaction> transactions = (ArrayList<Transaction>) transaction_mappings.get("transactions");
 
 				List<Map<String, Object>> transaction_list = new ArrayList<>();
 
 				BigDecimal income = BigDecimal.valueOf(0);
 				BigDecimal outgoings = BigDecimal.valueOf(0);
 
-				for(Transaction transaction : transactions) {
+				for(Transaction transaction : transactions.reversed()) {
 					Map<String, Object> transaction_map = new HashMap<>();
 
 					transaction_map.put("timestamp_date", transaction.getTimestamp().split(" ")[0]);
@@ -185,7 +191,6 @@ public class AccountController extends Controller {
 					switch(transaction.getType()) {
 						case "PAYMENT" -> {
 							if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-								account.withdraw(transaction.getAmount(), true);
 								transaction.setProcessed(true);
 
 								outgoings = outgoings.add(transaction.getAmount());
@@ -196,7 +201,6 @@ public class AccountController extends Controller {
 
 						case "WITHDRAWAL" -> {
 							if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
-								account.withdraw(transaction.getAmount(), false);
 								transaction.setProcessed(true);
 
 								outgoings = outgoings.add(transaction.getAmount());
@@ -207,7 +211,6 @@ public class AccountController extends Controller {
 
 						case "DEPOSIT" -> {
 							if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-								account.deposit(transaction.getAmount());
 								transaction.setProcessed(true);
 
 								income = income.add(transaction.getAmount());
@@ -221,7 +224,6 @@ public class AccountController extends Controller {
 							if(transaction.getSender().equals(uuid)) {
 								if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
 									if(account.getBalance().compareTo(transaction.getAmount()) > 0) {
-										account.withdraw(transaction.getAmount(), false);
 										transaction.setProcessed(true);
 
 										outgoings = outgoings.add(transaction.getAmount());
@@ -234,7 +236,6 @@ public class AccountController extends Controller {
 							// We're getting money in
 							else {
 								if(transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-									account.deposit(transaction.getAmount());
 									transaction.setProcessed(true);
 
 									income = income.add(transaction.getAmount());
